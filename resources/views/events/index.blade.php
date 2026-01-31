@@ -5,13 +5,13 @@
         </h2>
     </x-slot>
 
-    <div class="py-12 bg-[#1a2c42] min-h-screen">
+    <div class="py-12 min-h-screen">
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
 
             {{-- Balance --}}
-            <div class="mb-8 flex justify-between items-center bg-[#0f1d2e] p-4 rounded-xl border border-slate-700">
-                <span class="font-bold uppercase tracking-wider text-sm text-white">Eventos</span>
-                <div class="text-gray-300 text-xs">
+            <div class="mb-8 flex justify-between items-center p-4 rounded-xl border border-slate-700">
+                <span class="font-bold uppercase tracking-wider text-sm">Eventos</span>
+                <div class="text-xs">
                     <span class="opacity-70">Balance:</span>
                     <strong class="ml-1">
                         {{ auth()->user()->coins }}
