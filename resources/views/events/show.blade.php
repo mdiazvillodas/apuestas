@@ -87,7 +87,7 @@
 
             {{-- Already bet --}}
             @if($myBet)
-                <div class="bg-[#0f1d2e] border border-slate-700 rounded-xl p-4 text-center">
+                <div class="border border-slate-700 rounded-xl p-4 text-center">
                     <p class="font-bold uppercase text-xs">You already placed a bet</p>
 
                     <p class="mt-2 text-sm font-black">
