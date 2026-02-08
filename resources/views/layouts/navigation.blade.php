@@ -150,6 +150,30 @@
             <x-responsive-nav-link :href="route('dashboard')">Dashboard</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('events.index')">Events</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('bets.my')">My Bets</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('leaderboard.index')" :active="request()->routeIs('leaderboard.*')">Leaderboard</x-responsive-nav-link>
+            @if(Auth::user()->role === 'admin')
+                <div class="border-t border-gray-200 pt-2 mt-2">
+                    <x-responsive-nav-link :href="route('admin.events.index')">
+                        Admin · Events
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.events.create')">
+                        Admin · Create Event
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.bets.index')">
+                        Admin · Bets Log
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.teams.index')">
+                        Admin · Teams
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('admin.coin-grants.index')">
+                        Admin · Coin Grants
+                    </x-responsive-nav-link>
+                </div>
+            @endif            
         </div>
     </div>
 </nav>
