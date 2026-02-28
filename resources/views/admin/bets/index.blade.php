@@ -37,14 +37,16 @@
                                     </td>
 
                                     <td class="p-2 border">
-                                        @if($bet->selection === 'team_a')
-                                            {{ $bet->event->team_a_name }}
-                                        @elseif($bet->selection === 'team_b')
-                                            {{ $bet->event->team_b_name }}
-                                        @else
-                                            Draw
+                                        @if ($bet->selection === 'team_a')
+                                            {{ optional($bet->event->teamA)->name ?? 'Team A' }}
+                                        @elseif ($bet->selection === 'team_b')
+                                            {{ optional($bet->event->teamB)->name ?? 'Team B' }}
+                                        @elseif ($bet->selection === 'draw')
+                                            Empate
                                         @endif
                                     </td>
+
+
 
                                     <td class="p-2 border">
                                         {{ $bet->amount }}

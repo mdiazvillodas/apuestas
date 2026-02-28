@@ -1,30 +1,31 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800">
-            Place your bet
-        </h2>
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-xl text-gray-800">
+                    {{ __('Place your bet') }}
+                </h2>
+            </div>     
     </x-slot>
 
-    <div class="py-8 min-h-screen">
-
-        {{-- Balance --}}
-        <div class="mb-8 max-w-xl mx-auto flex justify-between items-center p-4 rounded-xl border border-slate-700">
-            <span class="font-bold uppercase tracking-wider text-sm">Sport Bets</span>
-            <div class="text-xs">
-                <span class="opacity-70">Balance:</span>
-                <strong class="ml-1">
-                    {{ auth()->user()->coins }}
-                    <span class="text-[10px] border border-gray-500 rounded-full px-1">s</span>
-                </strong>
-            </div>
-        </div>
-
+    <div class="page-fade py-12 min-h-screen">
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
+            <a
+                href="{{ route('events.index') }}"
+                class="inline-flex items-center mb-4 text-sm font-semibold text-gray-500 hover:text-gray-800"
+            >
+                ← Back to events
+            </a>
+
+
+
 
             {{-- Event card --}}
             <div class="bg-white rounded-xl p-8 shadow-2xl mb-6 border border-gray-200">
-
+                <h3 class="event-title text-center text-xl font-black text-gray-900 mb-4">
+                    {{ $event->title }}
+                </h3>
                 <div class="flex justify-between items-start">
+
 
                     {{-- Team A --}}
                     <div class="flex flex-col items-center flex-1">
@@ -38,11 +39,11 @@
                             ">
                         </div>
 
-                        <h3 class="text-[10px] font-bold uppercase text-center h-8 leading-tight">
+                        <h3 class="event-team text-[10px] font-bold uppercase text-center h-8 leading-tight">
                             {{ optional($event->teamA)->name ?? '—' }}
                         </h3>
 
-                        <div class="text-lg font-black text-gray-900 mt-1">
+                        <div class="event-rate text-lg font-black text-gray-900 mt-1">
                             {{ number_format($event->payoutFor('team_a'), 2) }}x
                         </div>
                     </div>
@@ -63,11 +64,11 @@
                             ">
                         </div>
 
-                        <h3 class="text-[10px] font-bold uppercase text-center h-8 leading-tight">
+                        <h3 class="event-team text-[10px] font-bold uppercase text-center h-8 leading-tight">
                             {{ optional($event->teamB)->name ?? '—' }}
                         </h3>
 
-                        <div class="text-lg font-black text-gray-900 mt-1">
+                        <div class="event-rate text-lg font-black text-gray-900 mt-1">
                             {{ number_format($event->payoutFor('team_b'), 2) }}x
                         </div>
                     </div>

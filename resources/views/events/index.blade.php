@@ -1,25 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800">
-            {{ __('Sport Bets') }}
-        </h2>
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl">
+                    {{ __('Six Nations 2026') }}
+                </h2>
+                <div class="text-md">
+
+                </div>  
+            </div>          
     </x-slot>
 
-    <div class="py-12 min-h-screen">
+    <div class="page-fade py-12 min-h-screen">
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
-
-            {{-- Balance --}}
-            <div class="mb-8 flex justify-between items-center p-4 rounded-xl border border-slate-700">
-                <span class="font-bold uppercase tracking-wider text-sm">Eventos</span>
-                <div class="text-xs">
-                    <span class="opacity-70">Balance:</span>
-                    <strong class="ml-1">
-                        {{ auth()->user()->coins }}
-                        <span class="text-[10px] border border-gray-500 rounded-full px-1">s</span>
-                    </strong>
-                </div>
-            </div>
-
             {{-- Lista de Eventos --}}
             <div class="space-y-6">
                 @forelse($events as $event)
@@ -28,8 +20,10 @@
                         $myBet = $event->bets->first();
                     @endphp
 
-                    <div style="padding-top:20px;" class="bg-white rounded-xl p-8 shadow-2xl border border-gray-200">
-
+                    <div style="padding-top:20px;" class="leaderboard bg-white rounded-xl p-8 shadow-2xl border border-gray-200">
+                        <h3 style="font-family:'Bebas Neue'" class="event-title text-center text-sm uppercase tracking-wider mb-4 text-xl text-gray-600">
+                            {{ $event->title }}
+                        </h3>
                         {{-- Equipos --}}
                         <div class="flex justify-between items-start">
 
@@ -47,11 +41,11 @@
                                     ">
                                 </div>
 
-                                <h3 class="text-[10px] font-bold uppercase text-center h-8 leading-tight">
+                                <h3 class="event-team text-[10px] font-bold uppercase text-center h-8 leading-tight">
                                     {{ $event->teamA?->name ?? 'TBD' }}
                                 </h3>
 
-                                <div class="text-lg font-black text-gray-900 mt-1">
+                                <div class="event-rate text-lg font-black text-gray-900 mt-1">
                                     {{ number_format($event->payoutFor('team_a'), 2) }}x
                                 </div>
                             </div>
@@ -75,11 +69,11 @@
                                     ">
                                 </div>
 
-                                <h3 class="text-[10px] font-bold uppercase text-center h-8 leading-tight">
+                                <h3 class="event-team text-[10px] font-bold uppercase text-center h-8 leading-tight">
                                     {{ $event->teamB?->name ?? 'TBD' }}
                                 </h3>
 
-                                <div class="text-lg font-black text-gray-900 mt-1">
+                                <div class="event-rate text-lg font-black text-gray-900 mt-1">
                                     {{ number_format($event->payoutFor('team_b'), 2) }}x
                                 </div>
                             </div>
@@ -90,14 +84,27 @@
                         <div class="mt-4 border-t border-gray-100 pt-4 text-center">
                             <div class="text-[10px] font-medium text-gray-400 uppercase tracking-tighter">
                                 Draw:
-                                <span class="font-bold text-gray-500">
+                                <span class=" text-gray-500">
                                     {{ number_format($event->payoutFor('draw'), 2) }}x
                                 </span>
+                                
                             </div>
 
-                            <div class="mt-2 text-[10px] font-bold text-gray-400">
-                                {{ $event->starts_at->timezone('Europe/Madrid')->format('M d, Y · H:i') }} CET
+                        <div class="mt-2 text-[10px] text-gray-400">
+                        <span
+                            class="event-start"
+                            data-start="{{ $event->starts_at->toIso8601String() }}"
+                        >
+                        </span>
+
+                            <div
+                                class="mt-1 text-[11px] text-gray-500 countdown"
+                                data-closes-at="{{ $event->betting_closes_at?->toIso8601String() }}"
+                            >
+                                —
                             </div>
+
+                        </div>
                         </div>
 
                         {{-- Acción --}}
@@ -121,19 +128,15 @@
 
                                 <div class="p-3 text-center rounded-lg
                                     {{ $hasResult ? ($won ? 'bg-green-100' : 'bg-red-100') : 'bg-gray-100' }}">
-
                                     <div class="text-[10px] font-bold uppercase text-gray-400">
                                         Your bet
                                     </div>
-
                                     <div class="mt-1 text-sm font-black">
                                         {{ strtoupper($selectionLabel) }}
                                     </div>
-
                                     <div class="text-xs text-gray-500 mt-1">
                                         {{ $myBet->amount }} coins
                                     </div>
-
                                     @if($hasResult)
                                         <div style="font-weight:700; padding-bottom:10px;" class="mt-2 text-xs font-bold uppercase
                                             {{ $won ? 'text-green-700' : 'text-red-700' }}">
@@ -145,9 +148,7 @@
                                         </div>
                                     @endif
                                 </div>
-
-                            @elseif($now->between($event->betting_opens_at, $event->betting_closes_at))
-
+                            @elseif($event->computed_status === 'open')
                                 <a
                                     href="{{ route('events.show', $event) }}"
                                     class="block w-full h-[50px] leading-[50px]

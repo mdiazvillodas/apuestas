@@ -10,22 +10,25 @@ class EventController extends Controller
     /**
      * Listado de eventos para players
      */
-    public function index()
-    {
-        $now = now();
+public function index()
+{
+    $now = now('UTC');
 
-        $events = Event::with(['bets' => function ($query) {
-                $query->where('user_id', auth()->id());
-            }])
-            ->where('betting_opens_at', '<=', $now)
-            ->where('betting_closes_at', '>=', $now->copy()->subHours(12))
-            ->orderBy('betting_opens_at')
-            ->get();
+    $events = Event::with(['bets' => function ($query) {
+            $query->where('user_id', auth()->id());
+        }])
+        ->where('status', '!=', 'draft')
+        ->where('betting_opens_at', '<=', $now)
+        ->where('betting_closes_at', '>=', $now->copy()->subHours(12))
+        ->orderBy('betting_opens_at', 'desc')
+        ->get();
 
-        return view('events.index', [
-            'events' => $events,
-        ]);
-    }
+    return view('events.index', [
+        'events' => $events,
+    ]);
+}
+
+
 
 
     /**

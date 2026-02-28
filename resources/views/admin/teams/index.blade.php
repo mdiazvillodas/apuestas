@@ -19,6 +19,7 @@
             <table class="w-full text-sm">
                 <thead class="border-b">
                     <tr>
+                        <th class="text-left p-3">Id</th>                        
                         <th class="text-left p-3">Logo</th>
                         <th class="text-left p-3">Name</th>
                         <th class="text-right p-3">Actions</th>
@@ -27,6 +28,7 @@
                 <tbody>
                     @foreach($teams as $team)
                         <tr class="border-b">
+                            <td class="p-3 font-bold">{{ $team->id }}</td>                            
                             <td class="p-3">
                                 <img src="{{ asset('storage/'.$team->logo_path) }}"
                                      class="w-8 h-8 object-contain">

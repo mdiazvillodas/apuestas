@@ -1,11 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl">
+        <h2 class=" text-xl">
             Leaderboard
         </h2>
     </x-slot>
 
-    <div style="margin-top:25px;" class="max-w-xl mx-auto px-12">
+    <div style="margin-top:25px;" class="leaderboard max-w-xl mx-auto px-2">
         <div class="bg-white shadow rounded-lg p-6">
 
             <h3 class="text-lg font-bold mb-4">Top Players</h3>
@@ -18,7 +18,7 @@
                         @csrf
                 @endif
 
-                <table class="w-full text-sm">
+                <table class="w-full text-md">
                     <thead>
                         <tr class="border-b">
                             <th class="text-left py-2">#</th>
@@ -29,15 +29,22 @@
                             @endif
 
                             <th class="text-left py-2">Player</th>
-                            <th class="text-right py-2">Coins</th>
+                            <th class="text-right">Won</th>
+                            <th class="text-right">Lost</th>
+                            <th class="text-right">Balance</th>
+                            <!--th class="text-right">Coins</th-->                            
+
                         </tr>
                     </thead>
 
                     <tbody>
                         @foreach($users as $index => $user)
-                            <tr class="border-b">
+                            <tr class="
+                            border-b
+                            {{ $index === 0 ? '' : '' }}
+                             {{ auth()->id() === $user->id ? 'font-bold' : '' }}
+                            ">
                                 <td class="py-2">{{ $index + 1 }}</td>
-
                                 {{-- SOLO ADMIN: checkbox --}}
                                 @if(auth()->check() && auth()->user()->role === 'admin')
                                     <td class="py-2">
@@ -49,11 +56,26 @@
                                     </td>
                                 @endif
 
-                                <td class="py-2">{{ $user->name }}</td>
-
-                                <td class="py-2 text-right font-bold">
-                                    {{ $user->coins }}
+                                <td class="py-2 capitalize">
+                                {{ $user->name }}
+                                @if($index === 0)
+                                    <span class="mr-2 text-yellow-600 text-lg">👑</span>
+                                @endif    
                                 </td>
+                                <td class="text-green-600 text-right">
+                                    +{{ number_format($user->coins_won, 0) }}
+                                </td>
+                                <td class="text-red-600 text-right">
+                                    ({{ number_format($user->coins_lost, 0) }})
+                                </td>
+
+                                <td class="text-right">
+                                    {{ number_format($user->balance, 0) }}
+                                </td>                                
+                                <!--td class="py-2 text-right font-bold">
+                                    {{ $user->coins }}
+                                </td-->
+
                             </tr>
                         @endforeach
                     </tbody>

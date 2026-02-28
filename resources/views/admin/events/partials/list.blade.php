@@ -22,10 +22,24 @@
                             Starts at:
                             {{ $event->starts_at->timezone('Europe/Madrid')->format('d M Y · H:i') }}
                         </p>
+                        {{-- Fecha inicio de apuestas --}}
+                        <p class="text-xs text-gray-400 mt-1">
+                            Betting opens at:
+                            {{ $event->betting_opens_at->timezone('Europe/Madrid')->format('d M Y · H:i') }}
+                        </p>                        
                     </div>
 
                     {{-- Actions --}}
                     <div class="flex gap-2">
+                        @if($mode !== 'finished')
+                        <a
+                            href="{{ route('admin.events.edit', $event) }}"
+                            class="px-3 py-1 bg-gray-200 rounded font-bold text-sm"
+                        >
+                            Editar
+                        </a>
+                        @endif
+
                         {{-- Draft → Open --}}
                         @if($mode === 'draft')
                             <form method="POST" action="{{ route('admin.events.open', $event) }}">
@@ -59,6 +73,7 @@
                                 <button class="px-3 py-1 bg-red-600 text-white rounded font-bold">
                                     Settle
                                 </button>
+
                             </form>
                         @endif
                     </div>

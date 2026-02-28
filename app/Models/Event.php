@@ -54,7 +54,7 @@ class Event extends Model
 
     public function getComputedStatusAttribute(): string
     {
-        $now = now();
+        $now = now('UTC');
 
         // Evento ya liquidado
         if ($this->status === 'finished') {
@@ -104,4 +104,23 @@ class Event extends Model
 
         return round($totalPool / $selectionPool, 2);
     }
+    /*public function payoutFor(string $selection): float
+    {
+        // Liquidez base simulada por lado
+        $baseLiquidity = 100;
+
+        // Pool real total
+        $realTotalPool = $this->bets()->sum('amount');
+
+        // Pool real del lado seleccionado
+        $realSelectionPool = $this->bets()
+            ->where('selection', $selection)
+            ->sum('amount');
+
+        // Ajuste con liquidez simulada
+        $adjustedTotalPool = $realTotalPool + ($baseLiquidity * 2);
+        $adjustedSelectionPool = $realSelectionPool + $baseLiquidity;
+
+        return round($adjustedTotalPool / $adjustedSelectionPool, 2);
+    }     */   
 }

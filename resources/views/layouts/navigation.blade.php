@@ -1,9 +1,10 @@
-<nav x-data="{ open: false }"
+<nav style="font-family: 'Bebas neue'" x-data="{ open: false }"
      class="relative bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
 
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+
+        <div class="flex justify-between h-16 fade-in-nav">
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
@@ -15,6 +16,8 @@
                         />
                     </a>
                 </div>
+
+
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -35,6 +38,7 @@
                         My Bets
                     </x-nav-link>
 
+
                     {{-- Admin dropdown (DESKTOP) --}}
                     @if(Auth::user()->role === 'admin')
                         <div class="relative inline-flex items-center h-full">
@@ -42,7 +46,7 @@
                                 <x-slot name="trigger">
                                     <button
                                         class="inline-flex items-center h-full px-1 pt-1 border-b-2 border-transparent
-                                               text-sm font-medium leading-5
+                                               text-lg font-medium leading-5
                                                text-gray-700 dark:text-gray-300
                                                hover:text-gray-900 dark:hover:text-gray-100
                                                focus:outline-none transition">
@@ -75,6 +79,10 @@
                                     <x-dropdown-link :href="route('admin.coin-grants.index')">
                                         Coin Grants
                                     </x-dropdown-link>
+                                    <x-dropdown-link :href="route('admin.events.import.form')">
+                                        Import
+                                    </x-dropdown-link>
+                                 
                                 </x-slot>
                             </x-dropdown>
                         </div>
@@ -85,11 +93,30 @@
 
             <!-- User Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                @php
+                    $user = auth()->user();
+                    $delta = $user->coins - ($user->last_seen_coins ?? $user->coins);
+                    $initialDisplay = $delta > 0 ? $user->last_seen_coins : $user->coins;
+                @endphp
+
+                <div class="absolute balance-pill">
+                    <img src="{{ asset('images/coin1.png') }}" class="w-5 h-5">
+
+                    <span id="nav-balance"
+                        data-delta="{{ $delta }}"
+                        data-current="{{ $user->coins }}"
+                        data-last="{{ $user->last_seen_coins }}">
+                        {{ $initialDisplay }}
+                    </span>
+                </div>
+
+
+  
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button
                             class="inline-flex items-center px-3 py-2 border border-transparent
-                                   text-sm leading-4 font-medium rounded-md
+                                   text-lg leading-4 font-medium rounded-md
                                    text-gray-500 dark:text-gray-400
                                    bg-white dark:bg-gray-800
                                    hover:text-gray-700 dark:hover:text-gray-300
@@ -114,12 +141,19 @@
                                 onclick="event.preventDefault(); this.closest('form').submit();">
                                 Log Out
                             </x-dropdown-link>
-                        </form>
+                        </form>                     
                     </x-slot>
+                    
                 </x-dropdown>
             </div>
 
             <!-- Hamburger -->
+            <div class="-me-2 flex items-center sm:hidden">
+                <div class="absolute balance-pill-mobile">
+                    <img src="{{ asset('images/coin1.png') }}" class="w-5 h-5">
+                    <span>{{ auth()->user()->coins }}</span>
+                </div> 
+            </div>
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = !open"
                         class="inline-flex items-center justify-center p-2 rounded-md
@@ -140,7 +174,7 @@
                               d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-            </div>
+            </div>    
         </div>
     </div>
 

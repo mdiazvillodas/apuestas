@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\CoinController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\CoinGrantController;
 
-
 /*
 |--------------------------------------------------------------------------
 | Public
@@ -87,6 +86,19 @@ Route::middleware('auth')->group(function () {
         ->name('events.show');
 });
 
+
+
+Route::post('/user/consume-coins-delta', function () {
+    if (auth()->check()) {
+        $user = auth()->user();
+        $user->last_seen_coins = $user->coins;
+        $user->save();
+    }
+
+    return response()->json(['status' => 'ok']);
+})->middleware('auth');
+
+
 /*
 |--------------------------------------------------------------------------
 | Admin routes
@@ -126,6 +138,25 @@ Route::middleware(['auth', 'admin'])
             ->except(['show']);
         Route::get('/coin-grants', [CoinGrantController::class, 'index'])
             ->name('coin-grants.index');
+        Route::get('/events/import', [AdminEventController::class, 'importForm'])
+            ->name('events.import.form');
+        Route::post('/events/import', [AdminEventController::class, 'import'])
+            ->name('events.import');
+        Route::post('/events/import/confirm', [AdminEventController::class, 'importConfirm'])
+            ->name('events.import.confirm');
+
+
+            
+
+
+Route::get('/events/{event}/edit', [AdminEventController::class, 'edit'])
+    ->name('events.edit');
+
+Route::put('/events/{event}', [AdminEventController::class, 'update'])
+    ->name('events.update');
+
+
+  
     
     
     });

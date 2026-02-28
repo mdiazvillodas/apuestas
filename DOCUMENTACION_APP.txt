@@ -1,0 +1,187 @@
+# Documentación de la app de apuestas
+
+## 1) Resumen funcional
+Esta aplicación es una plataforma de apuestas entre amigos con **coins ficticias**.
+
+Roles:
+- **player**: puede registrarse, iniciar sesión, ver eventos abiertos, apostar una vez por evento y consultar su historial.
+- **admin**: además de lo anterior, puede crear/abrir/liquidar eventos, gestionar equipos y otorgar coins manualmente.
+
+Puntos principales del negocio:
+- Cada apuesta descuenta coins al momento de crearla.
+- Se permite **1 apuesta por usuario por evento**.
+- La liquidación se hace en modo **parimutuel** (`total apostado / pool del resultado ganador`).
+- El ranking ordena usuarios por cantidad de coins.
+
+---
+
+## 2) Stack técnico
+- **Framework**: Laravel 12 (PHP 8.2+).
+- **Front-end**: Blade + Tailwind + Vite.
+- **Autenticación**: scaffold de Laravel Breeze (login/register/reset/password/profile).
+- **Tests**: Pest/Laravel Test (suite base de auth/profile).
+
+---
+
+## 3) Modelo de datos
+
+### `users`
+Campos relevantes:
+- `name`, `email`, `password`
+- `role` (`player` por defecto, `admin` para administración)
+- `coins` (saldo del usuario)
+
+### `events`
+Representa partidos/eventos apostables:
+- `title`
+- `team_a_id`, `team_b_id`
+- `betting_opens_at`, `betting_closes_at`, `starts_at`
+- `status` (`draft`, `open`, `closed`, `finished`)
+- `result` (selección ganadora: `team_a`, `team_b` o `draw`)
+
+### `bets`
+- `user_id`, `event_id`
+- `selection`
+- `amount`
+- `status` (`pending`, `won`, `lost`)
+
+### `teams`
+- `name`
+- `logo_path`
+
+### `coin_grants`
+Auditoría de créditos manuales de coins:
+- `user_id` (a quién se le acredita)
+- `admin_id` (quién lo acredita)
+- `amount`
+- `reason`
+
+---
+
+## 4) Reglas de negocio importantes
+
+### Estado computado del evento
+Aunque exista `status` persistido, el evento también expone `computed_status`:
+- `finished` si está liquidado
+- `draft` si aún no se abrió
+- `closed` si ya empezó o ya venció la ventana de apuestas
+- `open` en el único estado apto para apostar
+
+### Creación de apuesta
+Validaciones clave al apostar:
+1. El evento debe estar `open`.
+2. `selection` y `amount` válidos.
+3. El usuario debe tener saldo suficiente.
+4. El usuario no puede haber apostado antes en ese evento.
+5. Descuento de coins + creación de apuesta en transacción.
+
+### Liquidación de evento
+Cuando admin liquida:
+1. Se guarda `result` y evento pasa a `finished`.
+2. Se procesan apuestas `pending`.
+3. Apuestas ganadoras: `status = won` + acreditación por payout parimutuel.
+4. Apuestas perdedoras: `status = lost`.
+
+### Grants manuales de coins
+Desde leaderboard, un admin puede seleccionar usuarios y sumarles 1000 coins por acción, registrando cada operación en `coin_grants`.
+
+---
+
+## 5) Mapa de rutas (alto nivel)
+
+### Públicas
+- `GET /` → landing.
+- `GET /leaderboard` → ranking global.
+
+### Autenticadas (jugador)
+- `GET /dashboard` → resumen del usuario.
+- `GET /events` → listado de eventos visibles.
+- `GET /events/{event}` → detalle + formulario de apuesta (si está open).
+- `POST /events/{event}/bet` → crear apuesta.
+- `GET /my-bets` → historial propio.
+- Perfil y auth estándar de Laravel (`/profile`, login, register, reset, etc.).
+
+### Admin (`auth` + middleware `admin`)
+Prefijo `/admin`:
+- Dashboard admin.
+- ABM de eventos (listar/crear/abrir/liquidar).
+- Listado global de apuestas.
+- ABM de equipos + endpoint de búsqueda (`/admin/teams/search`).
+- Historial de grants (`/admin/coin-grants`).
+
+Además existen endpoints de grant desde leaderboard:
+- `POST /leaderboard/coins/preview`
+- `POST /leaderboard/coins/confirm`
+
+> Nota: en código están dentro de middleware `auth` y validan admin internamente.
+
+---
+
+## 6) Estructura de carpetas (guía rápida)
+- `app/Models`: entidades (`User`, `Event`, `Bet`, `Team`, `CoinGrant`).
+- `app/Http/Controllers`: controladores de jugador, auth y dashboard.
+- `app/Http/Controllers/Admin`: administración de eventos/equipos/coins.
+- `app/Http/Middleware/IsAdmin.php`: autorización de admin.
+- `routes/web.php` y `routes/auth.php`: definición de rutas.
+- `resources/views`: pantallas Blade (player/admin/auth).
+- `database/migrations`: estructura de base y evolución.
+
+---
+
+## 7) Flujos de uso
+
+### Flujo jugador
+1. Registro / login.
+2. Ver eventos.
+3. Entrar a un evento abierto.
+4. Elegir resultado + monto.
+5. Confirmar apuesta.
+6. Ver historial y ranking.
+
+### Flujo admin
+1. Crear equipos (o crearlos inline al crear evento).
+2. Crear evento en `draft`.
+3. Abrir evento (`open`).
+4. Al finalizar el partido, liquidar evento (`finished`) indicando resultado.
+5. Revisar apuestas globales y grants de coins.
+
+---
+
+## 8) Puesta en marcha local
+Prerequisitos:
+- PHP 8.2+
+- Composer
+- Node.js + npm
+- DB configurada en `.env`
+
+Comandos típicos:
+1. `composer install`
+2. `cp .env.example .env`
+3. `php artisan key:generate`
+4. `php artisan migrate`
+5. `npm install`
+6. `npm run dev` (desarrollo) o `npm run build` (producción)
+7. `php artisan serve`
+
+Scripts útiles definidos en `composer.json`:
+- `composer run setup`
+- `composer run dev`
+- `composer run test`
+
+---
+
+## 9) Operación en producción (recomendación)
+Dado que esta es la versión en producción:
+- Evitar cambios de lógica durante torneos en curso.
+- Priorizar releases de documentación/observabilidad.
+- Si se requiere cambio urgente, usar branch hotfix + respaldo DB + plan de rollback.
+
+---
+
+## 10) Deuda técnica observada (solo informativo)
+Sin modificar código, se observan oportunidades para futuro:
+- Endpoints de coins en rutas de player (aunque protegidos por validación interna de admin).
+- Método de cálculo de pool/payout también definido en `Bet` (debería centralizarse en `Event`).
+- Import `App\Models\Bets` en `Admin\EventController` parece no utilizado.
+- Conviene agregar tests de reglas críticas: apuesta única, saldo, ventana temporal, liquidación y grants.
+

@@ -12,6 +12,9 @@ class Bet extends Model
         'selection',
         'amount',
         'status',
+        'payout_multiplier',
+        'payout_amount',
+        'profit',        
     ];
 
     public function user()
@@ -55,5 +58,16 @@ class Bet extends Model
         }
 
         return round($total / $pool, 2);
-    }    
+    }
+    
+public function selectionLabel(): string
+{
+    return match ($this->selection) {
+        'team_a' => optional($this->event->teamA)->name,
+        'team_b' => optional($this->event->teamB)->name,
+        'draw'   => 'Draw',
+        default  => '—',
+    };
+}
+    
 }

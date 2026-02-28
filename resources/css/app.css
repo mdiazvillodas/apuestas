@@ -7,4 +7,157 @@
     html {
         font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
+    h2{
+        font-family: Bebas Neue, sans-serif;
+        font-size: 2rem !important;
+        color:#444;
+    }
+    .event-title{
+        color:#555;
+        font-family: "bebas neue";
+        font-size:2rem !important;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+    .event-team{
+    font-size: 1.2rem !important;
+    font-family: oswald !important;
+    font-weight: normal !important;
+    color: #555 !important;
+    }
+    .leaderboard{
+    font-size: 1rem !important;
+    font-family: oswald !important;
+    font-weight: normal !important;
+    color: #555 !important;
+    }    
+    .event-rate{
+    font-family: 'Oswald' !important;
+    font-weight: normal !important;
+    color: #555 !important;
+    font-size: 0.95rem !important;
+    }
+
+    .event-vs{
+    font-family: 'Bebas Neue';
+    color: #555 !important;
+    font-weight: normal !important;
+    font-size: 2rem !important;
+    }
+    .page-fade {
+        opacity: 0;
+        animation: fadeInPage 0.4s ease-out forwards;
+        animation-delay:250ms;
+    }
+
+    .score-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        max-width: 40vw;
+        overflow: hidden;
+    }
+
+    .score-digit {
+        min-width: 28px;
+        height: 38px;
+
+        background: linear-gradient(to bottom, #ffffff 50%, #f1f1f1 50%);
+        color: #111;
+
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(18px, 2.5vw, 26px);
+        font-weight: 700;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 6px;
+        border: 2px solid #0B1E3F;
+
+        box-shadow:
+            inset 0 2px 0 rgba(255,255,255,0.8),
+            inset 0 -2px 0 rgba(0,0,0,0.05),
+            0 4px 10px rgba(0,0,0,0.4);
+    }
+    .score-separator {
+        width: 6px;
+    }   
+
+    .balance-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(to bottom, #f1f1f1, #eee);
+        padding: 4px 14px;
+        border-radius: 0 0 9px 9px;
+        font-family: Bebas Neue, sans-serif;
+        font-size: 22px;
+        bottom: -42px;
+        box-shadow: 0 0px 2px #0006;
+        border-style: solid;
+        border-top: 0px;
+        opacity: 0;
+        animation: fadeInPage 0.4s ease-out forwards;
+        animation-delay:600ms;
+        color: #444;
+    }
+    .balance-pill-mobile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(to bottom, #f1f1f1, #eee);
+        padding: 4px 14px;
+        border-radius: 0 0 9px 9px;
+        font-family: Bebas Neue, sans-serif;
+        font-size: 22px;
+        bottom: -42px;
+        box-shadow: 0 0px 2px #0006;
+        border-style: solid;
+        border-top: 0px;
+        opacity: 0;
+        animation: fadeInPage 0.4s ease-out forwards;
+        animation-delay:600ms;
+        right:4px;
+        color: #444;
+    }    
+    .balance-floating {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -18px;
+
+        background: #f3f4f6; /* gris muy claro */
+        padding: 8px 18px;
+
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        border-radius: 999px;
+
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+    .fade-in-nav{
+            opacity: 0;
+        animation: fadeInPage 400ms ease-out forwards;
+        animation-delay:500ms;
+        }
+
+
+
+    @keyframes fadeInPage {
+        to {
+            opacity: 1;
+        }
+    }
+
+
 }
