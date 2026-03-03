@@ -2,7 +2,7 @@
     <x-slot name="header">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl">
-                    {{ __('Six Nations 2026') }}
+                    {{ __('Events') }}
                 </h2>
                 <div class="text-md">
 
