@@ -98,6 +98,17 @@ Route::post('/user/consume-coins-delta', function () {
     return response()->json(['status' => 'ok']);
 })->middleware('auth');
 
+Route::get('/test-api', function () {
+    return Http::withHeaders([
+        'x-apisports-key' => env('API_FOOTBALL_KEY'),
+    ])
+     ->withoutVerifying() // agregar esto
+        ->get('https://v3.football.api-sports.io/fixtures', [
+            'league' => 1,
+            'season' => 2022
+    ])->json();
+});  
+
 
 /*
 |--------------------------------------------------------------------------
@@ -155,8 +166,6 @@ Route::get('/events/{event}/edit', [AdminEventController::class, 'edit'])
 Route::put('/events/{event}', [AdminEventController::class, 'update'])
     ->name('events.update');
 
-
-  
     
     
     });
