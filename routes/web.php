@@ -155,17 +155,19 @@ Route::middleware(['auth', 'admin'])
             ->name('events.import');
         Route::post('/events/import/confirm', [AdminEventController::class, 'importConfirm'])
             ->name('events.import.confirm');
+        Route::get('/admin/run-fixture-sync', function () {
+            app(\App\Services\FixtureSyncService::class)
+                ->sync(
+                    config('fixtures.league_id'),
+                    config('fixtures.season')
+                );
 
+            return 'Fixture sync completed';
+        });        
+        Route::get('/events/{event}/edit', [AdminEventController::class, 'edit'])
+            ->name('events.edit');
 
-            
+        Route::put('/events/{event}', [AdminEventController::class, 'update'])
+            ->name('events.update');
 
-
-Route::get('/events/{event}/edit', [AdminEventController::class, 'edit'])
-    ->name('events.edit');
-
-Route::put('/events/{event}', [AdminEventController::class, 'update'])
-    ->name('events.update');
-
-    
-    
     });
