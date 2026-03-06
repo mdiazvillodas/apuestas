@@ -17,6 +17,10 @@ class Event extends Model
         'starts_at',
         'status',
         'result',
+        'external_id',
+        'source',
+        'round',
+        'auto_managed',
     ];
 
     protected $casts = [

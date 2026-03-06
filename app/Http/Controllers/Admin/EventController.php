@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Bets;
 use App\Models\Team;
 use Carbon\Carbon;
+use App\Services\SettlementService;
 
 
 
@@ -114,58 +115,16 @@ public function store(Request $request)
 
     public function settle(Request $request, Event $event)
     {
-        $request->validate([
-            'result' => 'required|string',
-        ]);
+    $request->validate([
+        'result' => 'required|string',
+    ]);
 
-        // evitar doble liquidación
-        if ($event->status === 'finished') {
-            return back()->withErrors('Este evento ya fue liquidado.');
-        }
+    app(SettlementService::class)
+        ->settle($event, $request->result);
 
-        DB::transaction(function () use ($event, $request) {
-
-            // guardar resultado y cerrar evento
-            $event->update([
-                'result' => $request->result,
-                'status' => 'finished',
-            ]);
-
-            // solo apuestas pendientes
-            $bets = $event->bets()->where('status', 'pending')->get();
-
-            foreach ($bets as $bet) {
-
-                if ($bet->selection === $event->result) {
-
-                    $payout = $event->payoutFor($bet->selection);
-                    $winAmount = round($bet->amount * $payout, 2);
-                    $profit = $winAmount - $bet->amount;
-
-                    $bet->update([
-                        'status' => 'won',
-                        'payout_multiplier' => $payout,
-                        'payout_amount' => $winAmount,
-                        'profit' => $profit,
-                    ]);
-
-                    $bet->user->increment('coins', $winAmount);
-
-                } else {
-
-                    $bet->update([
-                        'status' => 'lost',
-                        'payout_multiplier' => null,
-                        'payout_amount' => 0,
-                        'profit' => -$bet->amount,
-                    ]);
-                }
-            }
-
-        });
-
-        return back()->with('success', 'Evento liquidado correctamente.');
+    return back()->with('success', 'Evento liquidado correctamente.');
     }
+
     public function open(Event $event)
     {
         if ($event->status !== 'draft') {
