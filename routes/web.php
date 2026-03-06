@@ -104,7 +104,7 @@ Route::get('/test-api', function () {
     ])
      ->withoutVerifying() // agregar esto
         ->get('https://v3.football.api-sports.io/fixtures', [
-            'next' => 10,
+            'date' => now()->toDateString()
     ])->json();
 });  
 
