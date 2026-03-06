@@ -104,8 +104,7 @@ Route::get('/test-api', function () {
     ])
      ->withoutVerifying() // agregar esto
         ->get('https://v3.football.api-sports.io/fixtures', [
-            'league' => 1,
-            'season' => 2022
+            'next' => 10,
     ])->json();
 });  
 
