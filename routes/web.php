@@ -155,7 +155,7 @@ Route::middleware(['auth', 'admin'])
             ->name('events.import');
         Route::post('/events/import/confirm', [AdminEventController::class, 'importConfirm'])
             ->name('events.import.confirm');
-        Route::get('/admin/run-fixture-sync', function () {
+        Route::get('/run-fixture-sync', function () {
             app(\App\Services\FixtureSyncService::class)
                 ->sync(
                     config('fixtures.league_id'),
