@@ -29,6 +29,13 @@ class FixtureSyncService
     }
 protected function syncSingleFixture(array $fixture): void
 {
+    if (
+        empty($fixture['teams']['home']['name']) ||
+        empty($fixture['teams']['away']['name'])
+    ) {
+        return;
+    }
+
     $externalId = $fixture['fixture']['id'];
 
     $startsAt = Carbon::parse($fixture['fixture']['date']);
@@ -41,7 +48,6 @@ protected function syncSingleFixture(array $fixture): void
         $event = $this->createEventFromFixture($fixture);
     } else {
 
-        // Solo actualizamos si es evento API auto gestionado
         if ($event->auto_managed && $event->status !== 'finished') {
 
             $event->update([
