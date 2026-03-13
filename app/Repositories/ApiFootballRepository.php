@@ -11,8 +11,10 @@ class ApiFootballRepository implements FixtureRepositoryInterface
     {
         $response = Http::withHeaders([
             'x-apisports-key' => config('fixtures.api_key'),
-        ])->get('https://v3.football.api-sports.io/fixtures', [
-            'next' => 20
+        ])
+        ->withoutVerifying()
+        ->get('https://v3.football.api-sports.io/fixtures', [
+            'date' => now()->toDateString()
         ]);
 
         if (!$response->successful()) {
@@ -27,9 +29,15 @@ class ApiFootballRepository implements FixtureRepositoryInterface
 
         $fixtures = collect($response->json('response'));
 
-        return $fixtures
-            ->filter(fn($f) => $f['league']['id'] == 39) // Premier League
-            ->values()
-            ->all();
+        // filtramos solo la liga que queremos (Premier League = 39)
+        $fixtures = $fixtures->filter(function ($fixture) {
+            return isset($fixture['league']['id']) && $fixture['league']['id'] == 39;
+        });
+
+        logger()->info('Premier fixtures found', [
+            'count' => $fixtures->count()
+        ]);
+
+        return $fixtures->values()->all();
     }
 }
