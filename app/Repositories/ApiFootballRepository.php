@@ -9,35 +9,30 @@ class ApiFootballRepository implements FixtureRepositoryInterface
 {
     public function getFixtures(int $leagueId, int $season): array
     {
-        $response = Http::withHeaders([
-            'x-apisports-key' => config('fixtures.api_key'),
-        ])
-        ->withoutVerifying()
-        ->get('https://v3.football.api-sports.io/fixtures', [
-            'date' => now()->toDateString()
-        ]);
+        $fixtures = collect();
 
-        if (!$response->successful()) {
+        for ($i = 0; $i < 7; $i++) {
 
-            logger()->error('API Football error', [
-                'status' => $response->status(),
-                'body' => $response->body(),
+            $date = now()->addDays($i)->toDateString();
+
+            $response = Http::withHeaders([
+                'x-apisports-key' => config('fixtures.api_key'),
+            ])
+            ->withoutVerifying()
+            ->get('https://v3.football.api-sports.io/fixtures', [
+                'date' => $date
             ]);
 
-            return [];
+            if (!$response->successful()) {
+                continue;
+            }
+
+            $fixtures = $fixtures->merge($response->json('response'));
         }
 
-        $fixtures = collect($response->json('response'));
-
-        // filtramos solo la liga que queremos (Premier League = 39)
-        $fixtures = $fixtures->filter(function ($fixture) {
-            return isset($fixture['league']['id']) && $fixture['league']['id'] == 39;
-        });
-
-        logger()->info('Premier fixtures found', [
-            'count' => $fixtures->count()
-        ]);
-
-        return $fixtures->values()->all();
+        return $fixtures
+            ->filter(fn($f) => $f['league']['id'] == 39)
+            ->values()
+            ->all();
     }
 }
