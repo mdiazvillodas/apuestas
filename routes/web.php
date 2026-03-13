@@ -169,4 +169,9 @@ Route::middleware(['auth', 'admin'])
         Route::put('/events/{event}', [AdminEventController::class, 'update'])
             ->name('events.update');
 
+        Route::get('/clear-events', function () {
+            \App\Models\Event::truncate();
+            return 'Events table cleared';
+        });            
+
     });

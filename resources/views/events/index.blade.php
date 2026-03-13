@@ -33,7 +33,7 @@
                                     class="w-20 h-20 mb-4"
                                     style="
                                         @if($event->teamA)
-                                            background: url('{{ asset('storage/'.$event->teamA->logo_path) }}');
+                                            background: url('{{ $event->teamA->logo_path }}');
                                             background-size: contain;
                                             background-position: center;
                                             background-repeat: no-repeat;
@@ -61,7 +61,7 @@
                                     class="w-20 h-20 mb-4"
                                     style="
                                         @if($event->teamB)
-                                            background: url('{{ asset('storage/'.$event->teamB->logo_path) }}');
+                                            background: url('{{ $event->teamB->logo_path }}');
                                             background-size: contain;
                                             background-position: center;
                                             background-repeat: no-repeat;
