@@ -16,6 +16,14 @@
                     Only admins should see this page.
                 </p>
             </div>
+                <div class="mb-6">
+                    <a
+                        href="/admin/run-fixture-sync"
+                        class="inline-block px-4 py-2 bg-indigo-600 rounded-lg text-white"
+                    >
+                        Correr API
+                    </a>
+                </div>            
         </div>
     </div>
 </x-app-layout>

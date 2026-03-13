@@ -169,7 +169,7 @@ Route::middleware(['auth', 'admin'])
         Route::put('/events/{event}', [AdminEventController::class, 'update'])
             ->name('events.update');
 
-        Route::get('/admin/clear-events', function () {
+        Route::get('/clear-events', function () {
 
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
