@@ -169,9 +169,17 @@ Route::middleware(['auth', 'admin'])
         Route::put('/events/{event}', [AdminEventController::class, 'update'])
             ->name('events.update');
 
-        Route::get('/clear-events', function () {
+        Route::get('/admin/clear-events', function () {
+
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+            \App\Models\Bet::truncate();
             \App\Models\Event::truncate();
-            return 'Events table cleared';
-        });            
+
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+            return 'Events and bets cleared';
+
+        });     
 
     });
