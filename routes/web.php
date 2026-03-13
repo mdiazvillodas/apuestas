@@ -98,15 +98,7 @@ Route::post('/user/consume-coins-delta', function () {
     return response()->json(['status' => 'ok']);
 })->middleware('auth');
 
-Route::get('/test-api', function () {
-    return Http::withHeaders([
-        'x-apisports-key' => env('API_FOOTBALL_KEY'),
-    ])
-     ->withoutVerifying() // agregar esto
-        ->get('https://v3.football.api-sports.io/fixtures', [
-            'date' => now()->toDateString()
-    ])->json();
-});  
+
 
 
 /*
@@ -180,6 +172,16 @@ Route::middleware(['auth', 'admin'])
 
             return 'Events and bets cleared';
 
-        });     
+        });
+        Route::get('/test-api', function () {
+            return Http::withHeaders([
+                'x-apisports-key' => env('API_FOOTBALL_KEY'),
+            ])
+            ->withoutVerifying() // agregar esto
+                ->get('https://v3.football.api-sports.io/fixtures', [
+            'league' => 39,
+            'season' => 2025,
+            ])->json();
+        });               
 
     });
