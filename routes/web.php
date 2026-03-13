@@ -179,8 +179,7 @@ Route::middleware(['auth', 'admin'])
             ])
             ->withoutVerifying() // agregar esto
                 ->get('https://v3.football.api-sports.io/fixtures', [
-            'league' => 39,
-            'season' => 2025,
+            'next' => 20
             ])->json();
         });               
 
