@@ -17,7 +17,7 @@ class FixtureSyncService
         $this->repository = $repository;
     }
 
-    public function sync(int $leagueId, int $season): void
+    /*public function sync(int $leagueId, int $season): void
     {
         $fixtures = $this->repository->getFixtures($leagueId, $season);
 
@@ -26,7 +26,26 @@ class FixtureSyncService
                 $this->syncSingleFixture($fixture);
             });
         }
-    }
+    }*/
+    public function sync(int $leagueId, int $season): void
+    {
+        $fixtures = $this->repository->getFixtures($leagueId, $season);
+
+        logger()->info('Fixtures count', [
+            'count' => count($fixtures)
+        ]);
+
+        foreach ($fixtures as $fixture) {
+
+            logger()->info('Processing fixture', [
+                'id' => $fixture['fixture']['id'] ?? null
+            ]);
+
+            DB::transaction(function () use ($fixture) {
+                $this->syncSingleFixture($fixture);
+            });
+        }
+    }        
 protected function syncSingleFixture(array $fixture): void
 {
     if (
