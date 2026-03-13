@@ -16,18 +16,6 @@ class ApiFootballRepository implements FixtureRepositoryInterface
         ]);
 
         if (!$response->successful()) {
-            return [];
-        }
-
-        $fixtures = collect($response->json('response'));
-
-        return $fixtures
-            ->filter(fn($f) => $f['league']['id'] == 39)
-            ->values()
-            ->all();
-    }
-
-        if (!$response->successful()) {
 
             logger()->error('API Football error', [
                 'status' => $response->status(),
@@ -37,6 +25,11 @@ class ApiFootballRepository implements FixtureRepositoryInterface
             return [];
         }
 
-        return $response->json('response') ?? [];
+        $fixtures = collect($response->json('response'));
+
+        return $fixtures
+            ->filter(fn($f) => $f['league']['id'] == 39) // Premier League
+            ->values()
+            ->all();
     }
 }
