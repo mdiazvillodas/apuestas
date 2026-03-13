@@ -12,9 +12,20 @@ class ApiFootballRepository implements FixtureRepositoryInterface
         $response = Http::withHeaders([
             'x-apisports-key' => config('fixtures.api_key'),
         ])->get('https://v3.football.api-sports.io/fixtures', [
-            'league' => 39,
-            'season' => 2025,
+            'next' => 20
         ]);
+
+        if (!$response->successful()) {
+            return [];
+        }
+
+        $fixtures = collect($response->json('response'));
+
+        return $fixtures
+            ->filter(fn($f) => $f['league']['id'] == 39)
+            ->values()
+            ->all();
+    }
 
         if (!$response->successful()) {
 
