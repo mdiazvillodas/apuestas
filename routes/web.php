@@ -179,7 +179,7 @@ Route::middleware(['auth', 'admin'])
             ])
             ->withoutVerifying() // agregar esto
                 ->get('https://v3.football.api-sports.io/fixtures', [
-            'next' => 20
+            'date' => now()->toDateString()
             ])->json();
         });               
 
