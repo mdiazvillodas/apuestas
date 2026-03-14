@@ -8,6 +8,7 @@ use App\Models\Event;
 
 class Kernel extends ConsoleKernel
 {
+    logger()->info('KERNEL LOADED - SCHEDULER INITIALIZED');
     protected function schedule(Schedule $schedule): void
     {
         $schedule->call(function () {
