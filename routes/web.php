@@ -55,7 +55,7 @@ require __DIR__.'/auth.php';
 | Player routes
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     // Lista de eventos disponibles para apostar
     Route::get('/events', [PlayerEventController::class, 'index'])
@@ -97,8 +97,6 @@ Route::post('/user/consume-coins-delta', function () {
 
     return response()->json(['status' => 'ok']);
 })->middleware('auth');
-
-
 
 
 /*
