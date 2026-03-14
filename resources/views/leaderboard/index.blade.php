@@ -31,7 +31,7 @@
                             <th class="text-left py-2">Player</th>
                             <th class="text-right">Won</th>
                             <th class="text-right">Lost</th>
-                            <th class="text-right">Balance</th>
+                            <th class="text-right">Profit</th>
                             <!--th class="text-right">Coins</th-->                            
 
                         </tr>

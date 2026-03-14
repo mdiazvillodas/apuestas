@@ -32,7 +32,7 @@
                         <div
                             class="w-20 h-20 mb-4"
                             style="
-                                background: url('{{ asset('storage/' . optional($event->teamA)->logo_path) }}');
+                                background: url('{{ $event->teamA->logo_path }}');
                                 background-size: contain;
                                 background-position: center;
                                 background-repeat: no-repeat;
@@ -57,7 +57,7 @@
                         <div
                             class="w-20 h-20 mb-4"
                             style="
-                                background: url('{{ asset('storage/' . optional($event->teamB)->logo_path) }}');
+                                background: url('{{ $event->teamB->logo_path }}');
                                 background-size: contain;
                                 background-position: center;
                                 background-repeat: no-repeat;

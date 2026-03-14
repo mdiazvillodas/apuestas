@@ -11,7 +11,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function () {
 
-            logger()->info('SCHEDULER RUNNING');
+            logger()->info('FIXTURE SYNC RUNNING');
 
             app(\App\Services\FixtureSyncService::class)
                 ->sync(
@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
                     config('fixtures.season')
                 );
 
-        })->everyThirtyMinutes();
+        });
     }
 
     protected function commands(): void
