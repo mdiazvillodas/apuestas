@@ -14,6 +14,10 @@ Schedule::call(function () {
 
     logger()->info('RUNNING SCHEDULED TASKS');
 
+    logger()->info('FIXTURE SOURCE', [
+        'source' => config('fixtures.source')
+    ]);
+
     app(FixtureSyncService::class)
         ->sync(
             config('fixtures.league_id'),
