@@ -14,7 +14,7 @@ class BrevoMailer
         ])->post('https://api.brevo.com/v3/smtp/email', [
             'sender' => [
                 'name' => 'NanoBet',
-                'email' => 'no-reply@nanobet.app'
+                'email' => 'mariano.diazvillodas@gmail.com'
             ],
             'to' => [
                 ['email' => $to]
