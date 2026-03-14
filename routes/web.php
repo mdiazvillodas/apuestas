@@ -9,6 +9,7 @@ use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\Admin\CoinController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\CoinGrantController;
+use App\Services\BrevoMailer;
 
 /*
 |--------------------------------------------------------------------------
@@ -97,6 +98,18 @@ Route::post('/user/consume-coins-delta', function () {
 
     return response()->json(['status' => 'ok']);
 })->middleware('auth');
+
+
+Route::get('/test-mail', function () {
+
+    BrevoMailer::send(
+        'mariano.diazvillodas@gmail.com',
+        'NanoBet test',
+        '<h1>Email test</h1>'
+    );
+
+    return 'mail sent';
+});
 
 
 /*
