@@ -17,37 +17,35 @@ class Kernel extends ConsoleKernel
         logger()->info('KERNEL LOADED - SCHEDULER INITIALIZED');
     }
 
-    protected function schedule(Schedule $schedule): void
-    {
-        $schedule->call(function () {
+protected function schedule(Schedule $schedule): void
+{
+    logger()->info('SCHEDULE METHOD ENTERED');
 
-            logger()->info('RUNNING SCHEDULED TASKS');
+    $schedule->call(function () {
 
-            // Sync de fixtures desde la API
-            app(\App\Services\FixtureSyncService::class)
-                ->sync(
-                    config('fixtures.league_id'),
-                    config('fixtures.season')
-                );
+        logger()->info('RUNNING SCHEDULED TASKS');
 
-            // Abrir apuestas automáticamente
-            Event::where('status', 'draft')
-                ->where('starts_at', '<=', now()->addHours(24))
-                ->update([
-                    'status' => 'open',
-                    'betting_opens_at' => now(),
-                ]);
+        app(\App\Services\FixtureSyncService::class)
+            ->sync(
+                config('fixtures.league_id'),
+                config('fixtures.season')
+            );
 
-            // Cerrar apuestas automáticamente
-            Event::where('status', 'open')
-                ->where('starts_at', '<=', now())
-                ->update([
-                    'status' => 'closed',
-                ]);
+        Event::where('status', 'draft')
+            ->where('starts_at', '<=', now()->addHours(24))
+            ->update([
+                'status' => 'open',
+                'betting_opens_at' => now(),
+            ]);
 
-        })->withoutOverlapping();
-    }
+        Event::where('status', 'open')
+            ->where('starts_at', '<=', now())
+            ->update([
+                'status' => 'closed',
+            ]);
 
+    })->everyMinute()->withoutOverlapping();
+}
     protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
