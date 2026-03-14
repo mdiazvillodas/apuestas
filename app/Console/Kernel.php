@@ -17,33 +17,33 @@ class Kernel extends ConsoleKernel
         logger()->info('KERNEL LOADED - SCHEDULER INITIALIZED');
     }
 
-protected function schedule(Schedule $schedule): void
-{
-    $schedule->call(function () {
+    protected function schedule(Schedule $schedule): void
+    {
+        $schedule->call(function () {
 
-        logger()->info('RUNNING SCHEDULED TASKS');
+            logger()->info('RUNNING SCHEDULED TASKS');
 
-        app(\App\Services\FixtureSyncService::class)
-            ->sync(
-                config('fixtures.league_id'),
-                config('fixtures.season')
-            );
+            app(\App\Services\FixtureSyncService::class)
+                ->sync(
+                    config('fixtures.league_id'),
+                    config('fixtures.season')
+                );
 
-        Event::where('status','draft')
-            ->where('starts_at','<=',now()->addHours(24))
-            ->update([
-                'status'=>'open',
-                'betting_opens_at'=>now()
-            ]);
+            Event::where('status','draft')
+                ->where('starts_at','<=',now()->addHours(24))
+                ->update([
+                    'status'=>'open',
+                    'betting_opens_at'=>now()
+                ]);
 
-        Event::where('status','open')
-            ->where('starts_at','<=',now())
-            ->update([
-                'status'=>'closed'
-            ]);
+            Event::where('status','open')
+                ->where('starts_at','<=',now())
+                ->update([
+                    'status'=>'closed'
+                ]);
 
-    });
-}
+        })->everyFiveMinutes();
+    }
     protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
