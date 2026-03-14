@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\BrevoMailer;
+use Illuminate\Support\Facades\URL;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -52,6 +54,30 @@ class User extends Authenticatable implements MustVerifyEmail
     public function bets()
     {
         return $this->hasMany(Bet::class);
+    }
+    
+    public function sendEmailVerificationNotification()
+    {
+    $verificationUrl = URL::temporarySignedRoute(
+        'verification.verify',
+        now()->addMinutes(60),
+        [
+            'id' => $this->getKey(),
+            'hash' => sha1($this->getEmailForVerification()),
+        ]
+    );
+
+    $html = "
+        <h2>Verify your NanoBet account</h2>
+        <p>Click the link below to verify your email:</p>
+        <a href='{$verificationUrl}'>Verify Email</a>
+    ";
+
+    BrevoMailer::send(
+        $this->email,
+        'Verify your NanoBet account',
+        $html
+    );
     }
 
 }
