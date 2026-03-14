@@ -14,6 +14,10 @@ Schedule::call(function () {
 
     logger()->info('RUNNING SCHEDULED TASKS');
 
+    logger()->info('ENV CHECK', [
+        'FIXTURE_DATA_SOURCE' => env('FIXTURE_DATA_SOURCE')
+    ]);
+
     logger()->info('FIXTURE SOURCE', [
         'source' => config('fixtures.source')
     ]);
