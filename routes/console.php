@@ -34,4 +34,18 @@ Schedule::call(function () {
             'status'=>'closed'
         ]);
 
+    Event::where('status','closed')
+        ->whereNotNull('result')
+        ->get()
+        ->each(function ($event) {
+
+            app(\App\Services\SettlementService::class)
+                ->settle($event, $event->result);
+
+            logger()->info('Event settled', [
+                'event_id' => $event->id
+            ]);
+
+        });        
+
 })->everyFiveMinutes();
