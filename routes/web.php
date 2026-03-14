@@ -100,7 +100,7 @@ Route::post('/user/consume-coins-delta', function () {
 })->middleware('auth');
 
 
-Route::get('/test-mail', function () {
+/*Route::get('/test-mail', function () {
 
     BrevoMailer::send(
         'mariano.diazvillodas@gmail.com',
@@ -109,7 +109,7 @@ Route::get('/test-mail', function () {
     );
 
     return 'mail sent';
-});
+});*/
 
 
 /*
@@ -185,13 +185,21 @@ Route::middleware(['auth', 'admin'])
 
         });
         Route::get('/test-api', function () {
-            return Http::withHeaders([
-                'x-apisports-key' => env('API_FOOTBALL_KEY'),
-            ])
-            ->withoutVerifying() // agregar esto
-                ->get('https://v3.football.api-sports.io/fixtures', [
-            'date' => now()->toDateString()
-            ])->json();
-        });               
+
+            $date = now()->toDateString();
+
+            $response = Http::withHeaders([
+                'x-apisports-key' => config('fixtures.api_key'),
+            ])->get('https://v3.football.api-sports.io/fixtures', [
+                'date' => $date
+            ]);
+
+            return [
+                'status' => $response->status(),
+                'date' => $date,
+                'count' => count($response->json('response') ?? []),
+                'response' => $response->json()
+            ];
+        });              
 
     });
