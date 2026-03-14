@@ -19,8 +19,6 @@ class Kernel extends ConsoleKernel
 
 protected function schedule(Schedule $schedule): void
 {
-    logger()->info('SCHEDULE METHOD ENTERED');
-
     $schedule->call(function () {
 
         logger()->info('RUNNING SCHEDULED TASKS');
@@ -31,20 +29,20 @@ protected function schedule(Schedule $schedule): void
                 config('fixtures.season')
             );
 
-        Event::where('status', 'draft')
-            ->where('starts_at', '<=', now()->addHours(24))
+        Event::where('status','draft')
+            ->where('starts_at','<=',now()->addHours(24))
             ->update([
-                'status' => 'open',
-                'betting_opens_at' => now(),
+                'status'=>'open',
+                'betting_opens_at'=>now()
             ]);
 
-        Event::where('status', 'open')
-            ->where('starts_at', '<=', now())
+        Event::where('status','open')
+            ->where('starts_at','<=',now())
             ->update([
-                'status' => 'closed',
+                'status'=>'closed'
             ]);
 
-    })->everyMinute()->withoutOverlapping();
+    });
 }
     protected function commands(): void
     {
