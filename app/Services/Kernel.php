@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
                     config('fixtures.season')
                 );
 
-        });
+        })->everyMinute()->withoutOverlapping();
     }
 
     protected function commands(): void
