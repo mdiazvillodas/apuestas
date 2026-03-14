@@ -4,11 +4,19 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Events\Dispatcher;
 use App\Models\Event;
 
 class Kernel extends ConsoleKernel
 {
-    logger()->info('KERNEL LOADED - SCHEDULER INITIALIZED');
+    public function __construct(Application $app, Dispatcher $events)
+    {
+        parent::__construct($app, $events);
+
+        logger()->info('KERNEL LOADED - SCHEDULER INITIALIZED');
+    }
+
     protected function schedule(Schedule $schedule): void
     {
         $schedule->call(function () {
