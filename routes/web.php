@@ -195,11 +195,13 @@ Route::middleware(['auth', 'admin'])
             ]);
 
             return [
-                'status' => $response->status(),
                 'date' => $date,
+                'status' => $response->status(),
+                'successful' => $response->successful(),
                 'count' => count($response->json('response') ?? []),
-                'response' => $response->json()
+                'body_raw' => $response->body(),
+                'response' => $response->json(),
             ];
-        });              
+        });             
 
     });
