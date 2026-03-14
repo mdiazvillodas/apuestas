@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(FixtureRepositoryInterface::class, function () {
 
-            return config('fixtures.source') === 'api'
+            return env('FIXTURE_DATA_SOURCE') === 'api'
                 ? new ApiFootballRepository()
                 : new FakeFixtureRepository();
         });
