@@ -11,8 +11,10 @@ class ApiFootballRepository implements FixtureRepositoryInterface
     {
         $date = now()->toDateString();
 
-        logger()->info('REQUESTING API FOOTBALL', [
-            'date' => $date
+        logger()->info('API REPOSITORY RUNNING', [
+            'league' => $leagueId,
+            'season' => $season,
+            'api_key_present' => config('fixtures.api_key') ? true : false
         ]);
 
         $response = Http::withHeaders([
