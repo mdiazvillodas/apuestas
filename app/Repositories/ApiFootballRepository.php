@@ -11,35 +11,37 @@ class ApiFootballRepository implements FixtureRepositoryInterface
     {
         $fixtures = collect();
 
-        for ($i = 0; $i < 7; $i++) {
+        // TEST: pedir solo el viernes 20-03-2026
+        $date = '2026-03-20';
 
-            $date = now()->addDays($i)->toDateString();
+        logger()->info('REQUESTING FIXTURES TEST', [
+            'date' => $date
+        ]);
 
-            logger()->info('REQUESTING FIXTURES', [
-                'date' => $date
+        $response = Http::withHeaders([
+            'x-apisports-key' => config('fixtures.api_key'),
+        ])->get('https://v3.football.api-sports.io/fixtures', [
+            'date' => $date
+        ]);
+
+        if (!$response->successful()) {
+
+            logger()->error('API Football request failed', [
+                'date' => $date,
+                'status' => $response->status(),
+                'body' => $response->body()
             ]);
 
-            $response = Http::withHeaders([
-                'x-apisports-key' => config('fixtures.api_key'),
-            ])->get('https://v3.football.api-sports.io/fixtures', [
-                'date' => $date
-            ]);
-
-            if (!$response->successful()) {
-
-                logger()->error('API Football request failed', [
-                    'date' => $date,
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
-                continue;
-            }
-
-            $fixtures = $fixtures->merge(
-                $response->json('response') ?? []
-            );
+            return [];
         }
+
+        $fixtures = collect(
+            $response->json('response') ?? []
+        );
+
+        logger()->info('API RESPONSE TEST', [
+            'total_fixtures_returned' => $fixtures->count()
+        ]);
 
         return $fixtures
             ->filter(fn($f) => $f['league']['id'] == $leagueId)
