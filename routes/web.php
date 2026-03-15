@@ -186,22 +186,32 @@ Route::middleware(['auth', 'admin'])
         });
         Route::get('/test-api', function () {
 
-            $date = now()->toDateString();
+            $results = [];
 
-            $response = Http::withHeaders([
-                'x-apisports-key' => config('fixtures.api_key'),
-            ])->get('https://v3.football.api-sports.io/fixtures', [
-                'date' => $date
-            ]);
+            for ($i = 0; $i < 7; $i++) {
+
+                $date = now()->addDays($i)->toDateString();
+
+                $response = Http::withHeaders([
+                    'x-apisports-key' => config('fixtures.api_key'),
+                ])->get('https://v3.football.api-sports.io/fixtures', [
+                    'date' => $date
+                ]);
+
+                $results[] = [
+                    'date' => $date,
+                    'status' => $response->status(),
+                    'successful' => $response->successful(),
+                    'count' => count($response->json('response') ?? []),
+                ];
+            }
 
             return [
-                'date' => $date,
-                'status' => $response->status(),
-                'successful' => $response->successful(),
-                'count' => count($response->json('response') ?? []),
-                'body_raw' => $response->body(),
-                'response' => $response->json(),
+                'api_key_present' => config('fixtures.api_key') ? true : false,
+                'league_id' => config('fixtures.league_id'),
+                'season' => config('fixtures.season'),
+                'results' => $results
             ];
-        });             
+        });       
 
     });
