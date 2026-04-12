@@ -176,9 +176,9 @@
                                     @else
                                         <span class="text-blue-600">
                                             @if($event->result === 'team_a')
-                                                Ganó {{ $event->teamA?->name }}
+                                                {{ $event->teamA?->name }} Won
                                             @elseif($event->result === 'team_b')
-                                                Ganó {{ $event->teamB?->name }}
+                                                {{ $event->teamB?->name }} Won
                                             @else
                                                 Draw
                                             @endif

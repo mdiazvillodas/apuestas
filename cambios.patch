@@ -1,0 +1,298 @@
+From 730aa28d7a3252f5ccac4fb11be2ecf788fd7f31 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Sun, 12 Apr 2026 07:51:26 +0000
+Subject: [PATCH] Add AppSetting model, admin settings UI and optional welcome
+ coins on registration
+
+### Motivation
+
+- Introduce a simple key/value settings store to control platform behavior such as granting coins to new users.
+- Allow admins to toggle automatic welcome coin grants via the admin UI.
+- Enable dark-mode class support in the frontend so the layout can render in dark theme.
+
+### Description
+
+- Add `AppSetting` Eloquent model with `getBool` and `putBool` helpers and a migration `create_app_settings_table` to persist settings.
+- Add `PlatformSettingsController` with `edit` and `update` actions and an admin Blade view at `resources/views/admin/settings/edit.blade.php` to manage the `auto_register_coins_enabled` setting.
+- Wire up routes `admin.settings.edit` and `admin.settings.update`, and add admin navigation links to access the settings UI.
+- Update `RegisteredUserController` to assign `coins` = `1000` for new users when the `auto_register_coins_enabled` setting is true.
+- Enable Tailwind dark mode via `darkMode: 'class'` in `tailwind.config.js` and add the `class="dark"` attribute to the guest layout `<html>` element.
+
+### Testing
+
+- Ran the automated test suite with `php artisan test`, and the tests completed successfully.
+---
+ .../Admin/PlatformSettingsController.php      | 33 ++++++++++++++
+ .../Auth/RegisteredUserController.php         |  5 +++
+ app/Models/AppSetting.php                     | 32 +++++++++++++
+ ...04_11_120000_create_app_settings_table.php | 23 ++++++++++
+ resources/views/admin/settings/edit.blade.php | 45 +++++++++++++++++++
+ resources/views/layouts/guest.blade.php       |  2 +-
+ resources/views/layouts/navigation.blade.php  |  6 +++
+ routes/web.php                                |  5 +++
+ tailwind.config.js                            |  1 +
+ 9 files changed, 151 insertions(+), 1 deletion(-)
+ create mode 100644 app/Http/Controllers/Admin/PlatformSettingsController.php
+ create mode 100644 app/Models/AppSetting.php
+ create mode 100644 database/migrations/2026_04_11_120000_create_app_settings_table.php
+ create mode 100644 resources/views/admin/settings/edit.blade.php
+
+diff --git a/app/Http/Controllers/Admin/PlatformSettingsController.php b/app/Http/Controllers/Admin/PlatformSettingsController.php
+new file mode 100644
+index 0000000..53f687f
+--- /dev/null
++++ b/app/Http/Controllers/Admin/PlatformSettingsController.php
+@@ -0,0 +1,33 @@
++<?php
++
++namespace App\Http\Controllers\Admin;
++
++use App\Http\Controllers\Controller;
++use App\Models\AppSetting;
++use Illuminate\Http\RedirectResponse;
++use Illuminate\Http\Request;
++use Illuminate\View\View;
++
++class PlatformSettingsController extends Controller
++{
++    private const AUTO_REGISTER_COINS_KEY = 'auto_register_coins_enabled';
++
++    public function edit(): View
++    {
++        return view('admin.settings.edit', [
++            'autoRegisterCoinsEnabled' => AppSetting::getBool(self::AUTO_REGISTER_COINS_KEY),
++        ]);
++    }
++
++    public function update(Request $request): RedirectResponse
++    {
++        AppSetting::putBool(
++            self::AUTO_REGISTER_COINS_KEY,
++            $request->boolean('auto_register_coins_enabled')
++        );
++
++        return redirect()
++            ->route('admin.settings.edit')
++            ->with('success', 'Configuración actualizada.');
++    }
++}
+diff --git a/app/Http/Controllers/Auth/RegisteredUserController.php b/app/Http/Controllers/Auth/RegisteredUserController.php
+index 0739e2e..a700f3d 100644
+--- a/app/Http/Controllers/Auth/RegisteredUserController.php
++++ b/app/Http/Controllers/Auth/RegisteredUserController.php
+@@ -3,6 +3,7 @@
+ namespace App\Http\Controllers\Auth;
+ 
+ use App\Http\Controllers\Controller;
++use App\Models\AppSetting;
+ use App\Models\User;
+ use Illuminate\Auth\Events\Registered;
+ use Illuminate\Http\RedirectResponse;
+@@ -14,6 +15,9 @@
+ 
+ class RegisteredUserController extends Controller
+ {
++    private const WELCOME_COINS = 1000;
++    private const AUTO_REGISTER_COINS_KEY = 'auto_register_coins_enabled';
++
+     /**
+      * Display the registration view.
+      */
+@@ -39,6 +43,7 @@ public function store(Request $request): RedirectResponse
+             'name' => $request->name,
+             'email' => $request->email,
+             'password' => Hash::make($request->password),
++            'coins' => AppSetting::getBool(self::AUTO_REGISTER_COINS_KEY) ? self::WELCOME_COINS : 0,
+         ]);
+ 
+         event(new Registered($user));
+diff --git a/app/Models/AppSetting.php b/app/Models/AppSetting.php
+new file mode 100644
+index 0000000..5c8aac5
+--- /dev/null
++++ b/app/Models/AppSetting.php
+@@ -0,0 +1,32 @@
++<?php
++
++namespace App\Models;
++
++use Illuminate\Database\Eloquent\Model;
++
++class AppSetting extends Model
++{
++    protected $fillable = [
++        'key',
++        'value',
++    ];
++
++    public static function getBool(string $key, bool $default = false): bool
++    {
++        $value = static::query()->where('key', $key)->value('value');
++
++        if ($value === null) {
++            return $default;
++        }
++
++        return in_array(strtolower((string) $value), ['1', 'true', 'yes', 'on'], true);
++    }
++
++    public static function putBool(string $key, bool $value): void
++    {
++        static::query()->updateOrCreate(
++            ['key' => $key],
++            ['value' => $value ? '1' : '0']
++        );
++    }
++}
+diff --git a/database/migrations/2026_04_11_120000_create_app_settings_table.php b/database/migrations/2026_04_11_120000_create_app_settings_table.php
+new file mode 100644
+index 0000000..60c5599
+--- /dev/null
++++ b/database/migrations/2026_04_11_120000_create_app_settings_table.php
+@@ -0,0 +1,23 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    public function up(): void
++    {
++        Schema::create('app_settings', function (Blueprint $table) {
++            $table->id();
++            $table->string('key')->unique();
++            $table->string('value')->nullable();
++            $table->timestamps();
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::dropIfExists('app_settings');
++    }
++};
+diff --git a/resources/views/admin/settings/edit.blade.php b/resources/views/admin/settings/edit.blade.php
+new file mode 100644
+index 0000000..8cf1875
+--- /dev/null
++++ b/resources/views/admin/settings/edit.blade.php
+@@ -0,0 +1,45 @@
++<x-app-layout>
++    <x-slot name="header">
++        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
++            Admin Settings
++        </h2>
++    </x-slot>
++
++    <div class="py-8">
++        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
++            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6">
++                @if (session('success'))
++                    <div class="mb-4 rounded-md bg-green-100 text-green-800 px-4 py-2 text-sm">
++                        {{ session('success') }}
++                    </div>
++                @endif
++
++                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
++                    Registro de usuarios
++                </h3>
++
++                <form method="POST" action="{{ route('admin.settings.update') }}" class="space-y-6">
++                    @csrf
++                    @method('PUT')
++
++                    <label class="flex items-start gap-3">
++                        <input
++                            type="checkbox"
++                            name="auto_register_coins_enabled"
++                            value="1"
++                            @checked($autoRegisterCoinsEnabled)
++                            class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
++                        >
++                        <span class="text-sm text-gray-700 dark:text-gray-300">
++                            Otorgar automáticamente <strong>1000 coins</strong> a cada usuario nuevo al registrarse.
++                        </span>
++                    </label>
++
++                    <x-primary-button>
++                        Guardar configuración
++                    </x-primary-button>
++                </form>
++            </div>
++        </div>
++    </div>
++</x-app-layout>
+diff --git a/resources/views/layouts/guest.blade.php b/resources/views/layouts/guest.blade.php
+index 4b369b6..baa83be 100644
+--- a/resources/views/layouts/guest.blade.php
++++ b/resources/views/layouts/guest.blade.php
+@@ -1,5 +1,5 @@
+ <!DOCTYPE html>
+-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
++<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+     <head>
+         <meta charset="utf-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1">
+diff --git a/resources/views/layouts/navigation.blade.php b/resources/views/layouts/navigation.blade.php
+index eced816..c248f1e 100644
+--- a/resources/views/layouts/navigation.blade.php
++++ b/resources/views/layouts/navigation.blade.php
+@@ -82,6 +82,9 @@ class="inline-flex items-center h-full px-1 pt-1 border-b-2 border-transparent
+                                     <x-dropdown-link :href="route('admin.events.import.form')">
+                                         Import
+                                     </x-dropdown-link>
++                                    <x-dropdown-link :href="route('admin.settings.edit')">
++                                        Settings
++                                    </x-dropdown-link>
+                                  
+                                 </x-slot>
+                             </x-dropdown>
+@@ -206,6 +209,9 @@ class="hidden"
+                     <x-responsive-nav-link :href="route('admin.coin-grants.index')">
+                         Admin · Coin Grants
+                     </x-responsive-nav-link>
++                    <x-responsive-nav-link :href="route('admin.settings.edit')">
++                        Admin · Settings
++                    </x-responsive-nav-link>
+                 </div>
+             @endif            
+         </div>
+diff --git a/routes/web.php b/routes/web.php
+index bcaded4..08368d9 100644
+--- a/routes/web.php
++++ b/routes/web.php
+@@ -9,6 +9,7 @@
+ use App\Http\Controllers\Admin\CoinController;
+ use App\Http\Controllers\Admin\TeamController;
+ use App\Http\Controllers\Admin\CoinGrantController;
++use App\Http\Controllers\Admin\PlatformSettingsController;
+ use App\Services\BrevoMailer;
+ 
+ /*
+@@ -151,6 +152,10 @@
+             ->except(['show']);
+         Route::get('/coin-grants', [CoinGrantController::class, 'index'])
+             ->name('coin-grants.index');
++        Route::get('/settings', [PlatformSettingsController::class, 'edit'])
++            ->name('settings.edit');
++        Route::put('/settings', [PlatformSettingsController::class, 'update'])
++            ->name('settings.update');
+         Route::get('/events/import', [AdminEventController::class, 'importForm'])
+             ->name('events.import.form');
+         Route::post('/events/import', [AdminEventController::class, 'import'])
+diff --git a/tailwind.config.js b/tailwind.config.js
+index c29eb1a..3174ef2 100644
+--- a/tailwind.config.js
++++ b/tailwind.config.js
+@@ -3,6 +3,7 @@ import forms from '@tailwindcss/forms';
+ 
+ /** @type {import('tailwindcss').Config} */
+ export default {
++    darkMode: 'class',
+     content: [
+         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+         './storage/framework/views/*.php',
+-- 
+2.43.0
