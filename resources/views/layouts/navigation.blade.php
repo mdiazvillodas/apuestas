@@ -60,6 +60,9 @@
                                 </x-slot>
 
                                 <x-slot name="content">
+                                    <x-dropdown-link :href="route('admin.settings.edit')">
+                                        Settings
+                                    </x-dropdown-link>
                                     <x-dropdown-link :href="route('admin.events.index')">
                                         Events
                                     </x-dropdown-link>
@@ -205,6 +208,9 @@
 
                     <x-responsive-nav-link :href="route('admin.coin-grants.index')">
                         Admin · Coin Grants
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.settings.edit')">
+                        Admin · Settings
                     </x-responsive-nav-link>
                 </div>
             @endif            

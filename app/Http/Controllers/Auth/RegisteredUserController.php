@@ -11,9 +11,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Models\AppSetting;
 
 class RegisteredUserController extends Controller
 {
+    private const WELCOME_COINS = 1000;
+    private const AUTO_REGISTER_COINS_KEY = 'auto_register_coins_enabled';
     /**
      * Display the registration view.
      */
@@ -39,6 +42,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'coins' => AppSetting::getBool(self::AUTO_REGISTER_COINS_KEY) ? self::WELCOME_COINS : 0,
         ]);
 
         event(new Registered($user));

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CoinController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\CoinGrantController;
 use App\Services\BrevoMailer;
+use App\Http\Controllers\Admin\PlatformSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -165,7 +166,11 @@ Route::middleware(['auth', 'admin'])
                 );
 
             return 'Fixture sync completed';
-        });        
+        });
+        Route::get('/settings', [PlatformSettingsController::class, 'edit'])
+            ->name('settings.edit');
+        Route::put('/settings', [PlatformSettingsController::class, 'update'])
+            ->name('settings.update');        
         Route::get('/events/{event}/edit', [AdminEventController::class, 'edit'])
             ->name('events.edit');
 
