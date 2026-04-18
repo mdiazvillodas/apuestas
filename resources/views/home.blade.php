@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="min-h-screen flex flex-col justify-center items-center text-center px-4">
+    <div class="w-full flex flex-col justify-center items-center text-center px-4">
         <h1 class="text-3xl font-bold mb-4">
             Apuestas entre amigos
         </h1>

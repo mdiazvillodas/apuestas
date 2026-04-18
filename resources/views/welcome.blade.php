@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <div class="flex flex-col items-center justify-center min-h-screen text-center px-6">
+    <div class="w-full flex flex-col items-center justify-center text-center px-6">
         <img
             src="{{ asset('images/logo.png') }}"
             alt="Sport Bets"
