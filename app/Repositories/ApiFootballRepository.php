@@ -16,13 +16,17 @@ class ApiFootballRepository implements FixtureRepositoryInterface
             $date = now()->addDays($i)->toDateString();
 
             logger()->info('REQUESTING FIXTURES', [
-                'date' => $date
+                'date' => $date,
+                'league_id' => $leagueId,
+                'season' => $season,
             ]);
 
             $response = Http::withHeaders([
                 'x-apisports-key' => config('fixtures.api_key'),
             ])->get('https://v3.football.api-sports.io/fixtures', [
-                'date' => $date
+                'date' => $date,
+                'league' => $leagueId,
+                'season' => $season,
             ]);
 
             if (!$response->successful()) {
@@ -36,13 +40,17 @@ class ApiFootballRepository implements FixtureRepositoryInterface
                 continue;
             }
 
-            $fixtures = $fixtures->merge(
-                $response->json('response') ?? []
-            );
+            $dailyFixtures = $response->json('response') ?? [];
+
+            logger()->info('API Football fixtures response', [
+                'date' => $date,
+                'count' => count($dailyFixtures),
+            ]);
+
+            $fixtures = $fixtures->merge($dailyFixtures);
         }
 
         return $fixtures
-            ->filter(fn($f) => $f['league']['id'] == $leagueId)
             ->values()
             ->all();
     }

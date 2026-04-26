@@ -14,7 +14,10 @@ class SyncFixtures extends Command
     {
         $this->info('Starting fixture sync...');
 
-        $service->sync(1, 2026);
+        $service->sync(
+            config('fixtures.league_id'),
+            config('fixtures.season')
+        );
 
         $this->info('Fixtures synced successfully.');
     }
