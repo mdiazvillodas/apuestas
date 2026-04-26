@@ -4,8 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BetController;
 use App\Http\Controllers\EventController as PlayerEventController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\LeagueController;
 use App\Http\Controllers\Admin\CoinController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\CoinGrantController;
@@ -78,6 +80,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('bets.my', compact('bets'));
     })->name('bets.my');
 
+    Route::get('/my-leagues', [LeagueController::class, 'index'])
+        ->name('leagues.index');
+
+    Route::post('/my-leagues', [LeagueController::class, 'store'])
+        ->name('leagues.store');
+
+    Route::post('/my-leagues/{league}/join-requests', [LeagueController::class, 'requestJoin'])
+        ->name('leagues.join-requests.store');
+
+    Route::post('/my-leagues/{league}/join-requests/{joinRequest}/accept', [LeagueController::class, 'acceptRequest'])
+        ->name('leagues.join-requests.accept');
+
+    Route::post('/my-leagues/{league}/join-requests/{joinRequest}/reject', [LeagueController::class, 'rejectRequest'])
+        ->name('leagues.join-requests.reject');
+
+    Route::delete('/my-leagues/{league}/members/{user}', [LeagueController::class, 'removeMember'])
+        ->name('leagues.members.destroy');
+
     Route::post('/leaderboard/coins/preview', [CoinController::class, 'preview'])
         ->name('admin.coins.preview');
 
@@ -123,9 +143,11 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/', function () {
-            return view('admin.dashboard');
-        })->name('dashboard');
+        Route::get('/', [AdminDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        Route::post('/users/{user}/verify-email', [AdminDashboardController::class, 'verifyEmail'])
+            ->name('users.verify-email');
 
         // ABM de eventos
         Route::get('/events', [AdminEventController::class, 'index'])

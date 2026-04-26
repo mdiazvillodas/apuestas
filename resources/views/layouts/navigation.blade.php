@@ -1,5 +1,5 @@
 <nav style="font-family: 'Bebas neue'" x-data="{ open: false }"
-     class="relative bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+     class="relative z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
 
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
@@ -36,6 +36,10 @@
 
                     <x-nav-link :href="route('bets.my')" :active="request()->routeIs('bets.my')">
                         My Bets
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('leagues.index')" :active="request()->routeIs('leagues.*')">
+                        My Leagues
                     </x-nav-link>
 
 
@@ -187,6 +191,7 @@
             <x-responsive-nav-link :href="route('dashboard')">Dashboard</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('events.index')">Events</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('bets.my')">My Bets</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('leagues.index')" :active="request()->routeIs('leagues.*')">My Leagues</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('leaderboard.index')" :active="request()->routeIs('leaderboard.*')">Leaderboard</x-responsive-nav-link>
             @if(Auth::user()->role === 'admin')
                 <div class="border-t border-gray-200 pt-2 mt-2">

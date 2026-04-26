@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
 use App\Models\Bet;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class BetController extends Controller
 {
@@ -13,45 +14,48 @@ class BetController extends Controller
     {
         $user = auth()->user();
 
-        // 1. El evento debe estar abierto
         if ($event->computed_status !== 'open') {
-            return back()->withErrors('Este evento no acepta apuestas.');
+            return back()->withErrors('This event is not open for betting.');
         }
 
-        // 2. Validación básica
         $request->validate([
-            'selection' => 'required|string',
-            'amount' => 'required|integer|min:1',
+            'selection' => 'required|in:team_a,team_b,draw',
+            'amount' => 'required|integer|min:1|max:' . $user->coins,
         ]);
 
-        // 3. Saldo suficiente
-        if ($user->coins < $request->amount) {
-            return back()->withErrors('Saldo insuficiente.');
-        }
-
-        $alreadyBet = Bet::where('user_id', $user->id)
-            ->where('event_id', $event->id)
-            ->exists();
-
-        if ($alreadyBet) {
-            return back()->withErrors('Ya apostaste en este evento.');
-        }
-
-
-        // 4. Transacción segura
         DB::transaction(function () use ($user, $event, $request) {
-            // descontar coins
-            $user->decrement('coins', $request->amount);
+            $lockedUser = $user->newQuery()
+                ->whereKey($user->id)
+                ->lockForUpdate()
+                ->first();
 
-            // crear apuesta
+            if ($lockedUser->coins < $request->amount) {
+                throw ValidationException::withMessages([
+                    'amount' => 'Insufficient balance.',
+                ]);
+            }
+
+            $alreadyBet = Bet::where('user_id', $lockedUser->id)
+                ->where('event_id', $event->id)
+                ->lockForUpdate()
+                ->exists();
+
+            if ($alreadyBet) {
+                throw ValidationException::withMessages([
+                    'selection' => 'You already placed a bet on this event.',
+                ]);
+            }
+
+            $lockedUser->decrement('coins', $request->amount);
+
             Bet::create([
-                'user_id' => $user->id,
+                'user_id' => $lockedUser->id,
                 'event_id' => $event->id,
                 'selection' => $request->selection,
                 'amount' => $request->amount,
             ]);
         });
 
-        return back()->with('success', 'Apuesta realizada con éxito');
+        return back()->with('success', 'Bet placed successfully.');
     }
 }

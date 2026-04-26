@@ -35,7 +35,7 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <main class="relative z-0">
                 {{ $slot }}
             </main>
         </div>

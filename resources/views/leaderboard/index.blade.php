@@ -1,103 +1,122 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class=" text-xl">
+        <h2>
             Leaderboard
         </h2>
     </x-slot>
 
-    <div style="margin-top:25px;" class="leaderboard max-w-xl mx-auto px-2">
-        <div class="bg-white shadow rounded-lg p-6">
+    <div class="page-fade min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+        <div class="leaderboard mx-auto max-w-3xl space-y-5">
+            <section class="rounded-lg bg-white p-5 shadow sm:p-6">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h3 class="font-['Bebas_Neue'] text-3xl text-[#444]">
+                            {{ $activeLeague ? $activeLeague->name : 'General leaderboard' }}
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            Ranked by betting profit
+                        </p>
+                    </div>
 
-            <h3 class="text-lg font-bold mb-4">Top Players</h3>
-
-            @if($users->count())
-
-                {{-- SOLO ADMIN: abrimos el form --}}
-                @if(auth()->check() && auth()->user()->role === 'admin')
-                    <form method="POST" action="{{ route('admin.coins.preview') }}">
-                        @csrf
-                @endif
-
-                <table class="w-full text-md">
-                    <thead>
-                        <tr class="border-b">
-                            <th class="text-left py-2">#</th>
-
-                            {{-- SOLO ADMIN: columna checkbox --}}
-                            @if(auth()->check() && auth()->user()->role === 'admin')
-                                <th class="text-left py-2"></th>
-                            @endif
-
-                            <th class="text-left py-2">Player</th>
-                            <th class="text-right">Won</th>
-                            <th class="text-right">Lost</th>
-                            <th class="text-right">Profit</th>
-                            <!--th class="text-right">Coins</th-->                            
-
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach($users as $index => $user)
-                            <tr class="
-                            border-b
-                            {{ $index === 0 ? '' : '' }}
-                             {{ auth()->id() === $user->id ? 'font-bold' : '' }}
-                            ">
-                                <td class="py-2">{{ $index + 1 }}</td>
-                                {{-- SOLO ADMIN: checkbox --}}
-                                @if(auth()->check() && auth()->user()->role === 'admin')
-                                    <td class="py-2">
-                                        <input
-                                            type="checkbox"
-                                            name="users[]"
-                                            value="{{ $user->id }}"
-                                        >
-                                    </td>
-                                @endif
-
-                                <td class="py-2 capitalize">
-                                {{ $user->name }}
-                                @if($index === 0)
-                                    <span class="mr-2 text-yellow-600 text-lg">👑</span>
-                                @endif    
-                                </td>
-                                <td class="text-green-600 text-right">
-                                    +{{ number_format($user->coins_won, 0) }}
-                                </td>
-                                <td class="text-red-600 text-right">
-                                    ({{ number_format($user->coins_lost, 0) }})
-                                </td>
-
-                                <td class="text-right">
-                                    {{ number_format($user->balance, 0) }}
-                                </td>                                
-                                <!--td class="py-2 text-right font-bold">
-                                    {{ $user->coins }}
-                                </td-->
-
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-
-                {{-- SOLO ADMIN: botón --}}
-                @if(auth()->check() && auth()->user()->role === 'admin')
-                        <div class="mt-4">
-                            <button
-                                type="submit"
-                                class="px-4 py-2 bg-yellow-400 font-bold rounded"
+                    @auth
+                        <form method="GET" action="{{ route('leaderboard.index') }}">
+                            <select
+                                name="league"
+                                onchange="this.form.submit()"
+                                class="w-full rounded-lg border border-gray-300 p-2 text-sm font-bold focus:border-yellow-400 focus:ring-yellow-400 sm:w-56"
                             >
-                                Add 1000 coins
-                            </button>
-                        </div>
-                    </form>
+                                <option value="">General</option>
+                                @foreach($availableLeagues as $league)
+                                    <option value="{{ $league->id }}" @selected($activeLeague?->id === $league->id)>
+                                        {{ $league->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </form>
+                    @endauth
+                </div>
+            </section>
+
+            <section class="rounded-lg bg-white p-5 shadow sm:p-6">
+                @if($users->count())
+                    @if(auth()->check() && auth()->user()->role === 'admin')
+                        <form method="POST" action="{{ route('admin.coins.preview') }}">
+                            @csrf
+                    @endif
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-md">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="py-2 text-left">#</th>
+
+                                    @if(auth()->check() && auth()->user()->role === 'admin')
+                                        <th class="py-2 text-left"></th>
+                                    @endif
+
+                                    <th class="py-2 text-left">Player</th>
+                                    <th class="text-right">Won</th>
+                                    <th class="text-right">Lost</th>
+                                    <th class="text-right">Profit</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach($users as $index => $user)
+                                    <tr class="border-b {{ auth()->id() === $user->id ? 'font-bold' : '' }}">
+                                        <td class="py-3">{{ $index + 1 }}</td>
+
+                                        @if(auth()->check() && auth()->user()->role === 'admin')
+                                            <td class="py-3">
+                                                <input
+                                                    type="checkbox"
+                                                    name="users[]"
+                                                    value="{{ $user->id }}"
+                                                >
+                                            </td>
+                                        @endif
+
+                                        <td class="py-3 capitalize">
+                                            {{ $user->name }}
+                                            @if($index === 0)
+                                                <span class="ml-1 text-lg text-yellow-600">#1</span>
+                                            @endif
+                                        </td>
+
+                                        <td class="text-right text-green-600">
+                                            +{{ number_format($user->coins_won, 0) }}
+                                        </td>
+
+                                        <td class="text-right text-red-600">
+                                            ({{ number_format($user->coins_lost, 0) }})
+                                        </td>
+
+                                        <td class="text-right">
+                                            {{ number_format($user->balance, 0) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if(auth()->check() && auth()->user()->role === 'admin')
+                            <div class="mt-4">
+                                <button
+                                    type="submit"
+                                    class="rounded-lg bg-yellow-400 px-4 py-2 text-sm font-black uppercase text-gray-900"
+                                >
+                                    Add 1000 coins
+                                </button>
+                            </div>
+                        </form>
+                    @endif
+                @else
+                    <p class="py-8 text-center text-sm italic text-gray-500">
+                        No players found.
+                    </p>
                 @endif
-
-            @else
-                <p>No players found.</p>
-            @endif
-
+            </section>
         </div>
     </div>
 </x-app-layout>

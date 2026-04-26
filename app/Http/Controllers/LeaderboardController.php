@@ -2,13 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\League;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class LeaderboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('bets')
+        $activeLeague = null;
+        $availableLeagues = collect();
+        $userQuery = User::with('bets');
+
+        if ($request->user()) {
+            $availableLeagues = $request->user()
+                ->leagues()
+                ->orderBy('name')
+                ->get();
+        }
+
+        if ($request->filled('league')) {
+            abort_unless($request->user(), 403);
+
+            $activeLeague = League::with('members')
+                ->findOrFail($request->integer('league'));
+
+            abort_unless(
+                $activeLeague->members->contains('id', $request->user()->id),
+                403
+            );
+
+            $userQuery->whereIn('id', $activeLeague->members->pluck('id'));
+        }
+
+        $users = $userQuery
             ->get()
             ->map(function ($user) {
 
@@ -33,6 +60,8 @@ class LeaderboardController extends Controller
 
         return view('leaderboard.index', [
             'users' => $users,
+            'activeLeague' => $activeLeague,
+            'availableLeagues' => $availableLeagues,
         ]);
     }
 

@@ -1,102 +1,108 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl">
+        <h2>
             My Bets
         </h2>
     </x-slot>
 
-    <div class="py-8 bg-gray-100 min-h-screen">
-        <div style="margin-top:25px;" class="max-w-xl mx-auto sm:px-6 lg:px-8">
-
+    <div class="page-fade min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-4xl space-y-4">
             @if($bets->count())
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($bets as $bet)
+                    @php
+                        $selectionLabel = match ($bet->selection) {
+                            'team_a' => $bet->event->teamA?->name ?? 'Team A',
+                            'team_b' => $bet->event->teamB?->name ?? 'Team B',
+                            'draw' => 'Draw',
+                            default => 'Unknown',
+                        };
 
-                    @foreach($bets as $bet)
-                        <div class="bg-white rounded-xl shadow p-5 flex flex-col justify-between">
+                        $statusClasses = match ($bet->status) {
+                            'won' => 'bg-green-100 text-green-700 border-green-200',
+                            'lost' => 'bg-red-100 text-red-700 border-red-200',
+                            default => 'bg-gray-100 text-gray-600 border-gray-200',
+                        };
+                    @endphp
 
-                            {{-- Header: Evento --}}
-                            <div>
-                                <h3 class="font-bold text-sm uppercase text-gray-800">
+                    <article class="rounded-lg bg-white p-4 shadow sm:p-5">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="truncate text-base font-black text-gray-800">
                                     {{ $bet->event->title }}
-                                </h3>
-
-                                <p class="text-xs text-gray-500 mt-1">
+                                </p>
+                                <p class="mt-1 text-xs font-medium text-gray-500">
                                     {{ $bet->event->starts_at->format('M d, Y · H:i') }} CET
                                 </p>
                             </div>
 
-                            {{-- Selección --}}
-                            <div class="mt-4">
-                                <p class="text-xs uppercase text-gray-400">
-                                    Your pick
-                                </p>
+                            <span class="shrink-0 rounded-full border px-3 py-1 text-[11px] font-black uppercase {{ $statusClasses }}">
+                                {{ $bet->status }}
+                            </span>
+                        </div>
 
-                                <p class="font-bold text-gray-900">
-                                    @if($bet->selection === 'team_a')
-                                        {{ $bet->event->teamA?->name ?? 'Team A' }}
-                                    @elseif($bet->selection === 'team_b')
-                                        {{ $bet->event->teamB?->name ?? 'Team B' }}
-                                    @else
-                                        Draw
-                                    @endif
-
+                        <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                                <p class="text-[11px] font-bold uppercase text-gray-400">Pick</p>
+                                <p class="mt-1 truncate text-sm font-black text-gray-800">
+                                    {{ $selectionLabel }}
                                 </p>
                             </div>
-                            {{-- Amount --}}
-                            <div class="mt-3">
-                                <p class="text-xs uppercase text-gray-400">
-                                    Bet amount
+
+                            <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                                <p class="text-[11px] font-bold uppercase text-gray-400">Stake</p>
+                                <p class="mt-1 text-sm font-black text-gray-800">
+                                    {{ number_format($bet->amount, 0) }} coins
                                 </p>
+                            </div>
 
-                                <p class="font-bold">
-                                    {{ $bet->amount }} coins
-                                </p>
-
-                                @if($bet->status === 'won')
-                                    @php
-                                        $payout = $bet->event->payoutFor($bet->selection);
-                                        $wonCoins = round($bet->amount * $payout);
-                                    @endphp
-
-                                    <p style="color:green;" class="mt-1 text-sm font-bold text-green-700">
-                                        +{{ $wonCoins }} coins
+                            <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                                <p class="text-[11px] font-bold uppercase text-gray-400">Payout</p>
+                                @if($bet->status === 'won' && ! is_null($bet->payout_amount))
+                                    <p class="mt-1 text-sm font-black text-green-600">
+                                        +{{ number_format($bet->payout_amount, 0) }}
+                                    </p>
+                                @elseif($bet->status === 'lost')
+                                    <p class="mt-1 text-sm font-black text-red-600">
+                                        0
+                                    </p>
+                                @else
+                                    <p class="mt-1 text-sm font-black text-gray-400">
+                                        Pending
                                     </p>
                                 @endif
                             </div>
 
-
-                            {{-- Status --}}
-                            <div class="mt-4 pt-4 border-t flex justify-between items-center">
-
-                                <span class="text-xs uppercase text-gray-400">
-                                    Status
-                                </span>
-
-                                @if($bet->status === 'won')
-                                    <span style="color:green" class="text-xs font-bold px-3 py-1 rounded-full bg-green-100 text-green-700">
-                                        WON
-                                    </span>
-                                @elseif($bet->status === 'lost')
-                                    <span style="color:red" class="text-xs font-bold px-3 py-1 rounded-full bg-red-100 text-red-700">
-                                        LOST
-                                    </span>
+                            <div class="rounded-lg border border-gray-100 bg-gray-50 p-3">
+                                <p class="text-[11px] font-bold uppercase text-gray-400">Profit</p>
+                                @if(! is_null($bet->profit))
+                                    <p class="mt-1 text-sm font-black {{ $bet->profit >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ $bet->profit >= 0 ? '+' : '' }}{{ number_format($bet->profit, 0) }}
+                                    </p>
                                 @else
-                                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-gray-200 text-gray-600">
-                                        PENDING
-                                    </span>
+                                    <p class="mt-1 text-sm font-black text-gray-400">
+                                        Pending
+                                    </p>
                                 @endif
-
                             </div>
                         </div>
-                    @endforeach
-
-                </div>
+                    </article>
+                @endforeach
             @else
-                <div class="text-center py-12 text-gray-500 italic">
-                    You have no bets yet.
-                </div>
+                <section class="rounded-lg bg-white px-6 py-12 text-center shadow">
+                    <p class="font-['Bebas_Neue'] text-3xl text-[#444]">
+                        No bets yet
+                    </p>
+                    <p class="mt-2 text-sm text-gray-500">
+                        Your picks will appear here once you place your first bet.
+                    </p>
+                    <a
+                        href="{{ route('events.index') }}"
+                        class="mt-6 inline-flex h-11 items-center justify-center rounded-lg bg-yellow-400 px-5 text-sm font-black uppercase text-gray-900"
+                    >
+                        View events
+                    </a>
+                </section>
             @endif
-
         </div>
     </div>
 </x-app-layout>

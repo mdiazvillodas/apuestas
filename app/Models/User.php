@@ -55,6 +55,22 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Bet::class);
     }
+
+    public function ownedLeague()
+    {
+        return $this->hasOne(League::class, 'owner_id');
+    }
+
+    public function leagues()
+    {
+        return $this->belongsToMany(League::class, 'league_members')
+            ->withTimestamps();
+    }
+
+    public function leagueJoinRequests()
+    {
+        return $this->hasMany(LeagueJoinRequest::class);
+    }
     
     public function sendEmailVerificationNotification()
     {
