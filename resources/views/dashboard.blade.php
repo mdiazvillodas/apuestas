@@ -59,6 +59,58 @@
             <section class="rounded-lg bg-white p-5 shadow sm:p-6">
                 <div class="mb-4 flex items-center justify-between gap-3">
                     <div>
+                        <h3 class="font-['Bebas_Neue'] text-3xl text-[#444]">Upcoming matches</h3>
+                        <p class="text-sm text-gray-500">Next 5 events</p>
+                    </div>
+
+                    <a
+                        href="{{ route('events.index') }}"
+                        class="rounded-lg bg-yellow-400 px-3 py-2 text-xs font-black uppercase text-gray-900"
+                    >
+                        Events
+                    </a>
+                </div>
+
+                @if($upcomingEvents->count())
+                    <div class="space-y-3">
+                        @foreach($upcomingEvents as $event)
+                            <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="truncate text-sm font-black text-gray-800">
+                                            {{ $event->title }}
+                                        </p>
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            {{ $event->teamA?->name ?? 'TBD' }} vs {{ $event->teamB?->name ?? 'TBD' }}
+                                        </p>
+                                    </div>
+
+                                    <div class="shrink-0 text-right">
+                                        <p
+                                            class="event-start text-xs font-bold uppercase text-gray-400"
+                                            data-start="{{ $event->starts_at->toIso8601String() }}"
+                                        ></p>
+                                        <p
+                                            class="event-countdown mt-1 text-sm font-black text-yellow-600"
+                                            data-starts-at="{{ $event->starts_at->toIso8601String() }}"
+                                        >
+                                            -
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="py-8 text-center text-sm italic text-gray-500">
+                        No upcoming matches.
+                    </p>
+                @endif
+            </section>
+
+            <section class="rounded-lg bg-white p-5 shadow sm:p-6">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <div>
                         <h3 class="font-['Bebas_Neue'] text-3xl text-[#444]">Coins trend</h3>
                         <p class="text-sm text-gray-500">Last 14 days</p>
                     </div>

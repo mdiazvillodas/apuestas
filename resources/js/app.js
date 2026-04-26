@@ -279,6 +279,41 @@ function startCountdown(el) {
     setInterval(update, 1000);
 }
 
+function startEventCountdown(el) {
+    const iso = el.dataset.startsAt;
+    if (!iso) return;
+
+    const startsAt = new Date(iso);
+    if (isNaN(startsAt)) return;
+
+    function update() {
+        const now = new Date();
+        const diff = startsAt - now;
+
+        if (diff <= 0) {
+            el.textContent = 'Started';
+            el.classList.remove('text-yellow-600');
+            el.classList.add('text-red-500');
+            return;
+        }
+
+        const totalSeconds = Math.floor(diff / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+        if (days > 0) {
+            el.textContent = `${days}d ${hours}h left`;
+            return;
+        }
+
+        el.textContent = `${hours}h ${minutes}m left`;
+    }
+
+    update();
+    setInterval(update, 1000);
+}
+
 /*
 |--------------------------------------------------------------------------
 | Init
@@ -289,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAdminActivityChart();
     renderEventStartTimes();
     document.querySelectorAll('.countdown').forEach(startCountdown);
+    document.querySelectorAll('.event-countdown').forEach(startEventCountdown);
 });
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use Carbon\CarbonPeriod;
 
 class DashboardController extends Controller
@@ -65,6 +66,13 @@ class DashboardController extends Controller
             ->orderByDesc('profit')
             ->first();
 
+        $upcomingEvents = Event::with(['teamA', 'teamB'])
+            ->where('status', '!=', 'draft')
+            ->where('starts_at', '>', now('UTC'))
+            ->orderBy('starts_at')
+            ->limit(5)
+            ->get();
+
         $totalSettled = $wonBets + $lostBets;
         $winRate = $totalSettled > 0 ? round(($wonBets / $totalSettled) * 100) : 0;
 
@@ -81,6 +89,7 @@ class DashboardController extends Controller
             'chartValues' => $chartValues,
             'recentBets' => $recentBets,
             'bestBet' => $bestBet,
+            'upcomingEvents' => $upcomingEvents,
         ]);
     }
 }
