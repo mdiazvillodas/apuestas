@@ -9,49 +9,55 @@ class ApiFootballRepository implements FixtureRepositoryInterface
 {
     public function getFixtures(int $leagueId, int $season): array
     {
-        $fixtures = collect();
+        $from = now()->toDateString();
+        $to = now()->addDays(7)->toDateString();
 
-        for ($i = 0; $i < 7; $i++) {
+        logger()->info('REQUESTING FIXTURES', [
+            'from' => $from,
+            'to' => $to,
+            'league_id' => $leagueId,
+            'season' => $season,
+        ]);
 
-            $date = now()->addDays($i)->toDateString();
+        $response = Http::withHeaders([
+            'x-apisports-key' => config('fixtures.api_key'),
+        ])->get('https://v3.football.api-sports.io/fixtures', [
+            'league' => $leagueId,
+            'season' => $season,
+            'from' => $from,
+            'to' => $to,
+            'timezone' => 'UTC',
+        ]);
 
-            logger()->info('REQUESTING FIXTURES', [
-                'date' => $date,
-                'league_id' => $leagueId,
-                'season' => $season,
+        if (!$response->successful()) {
+            logger()->error('API Football request failed', [
+                'from' => $from,
+                'to' => $to,
+                'status' => $response->status(),
+                'body' => $response->body(),
             ]);
 
-            $response = Http::withHeaders([
-                'x-apisports-key' => config('fixtures.api_key'),
-            ])->get('https://v3.football.api-sports.io/fixtures', [
-                'date' => $date,
-                'league' => $leagueId,
-                'season' => $season,
-            ]);
-
-            if (!$response->successful()) {
-
-                logger()->error('API Football request failed', [
-                    'date' => $date,
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-
-                continue;
-            }
-
-            $dailyFixtures = $response->json('response') ?? [];
-
-            logger()->info('API Football fixtures response', [
-                'date' => $date,
-                'count' => count($dailyFixtures),
-            ]);
-
-            $fixtures = $fixtures->merge($dailyFixtures);
+            return [];
         }
 
-        return $fixtures
-            ->values()
-            ->all();
+        $payload = $response->json() ?? [];
+        $fixtures = $payload['response'] ?? [];
+        $errors = $payload['errors'] ?? [];
+
+        logger()->info('API Football fixtures range response', [
+            'from' => $from,
+            'to' => $to,
+            'count' => count($fixtures),
+            'errors' => $errors,
+            'paging' => $payload['paging'] ?? null,
+        ]);
+
+        if (!empty($errors)) {
+            logger()->warning('API Football returned errors.', [
+                'errors' => $errors,
+            ]);
+        }
+
+        return $fixtures;
     }
 }
