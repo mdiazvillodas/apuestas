@@ -122,8 +122,8 @@ protected function handleAutoOpen(Event $event): void
     if ($event->status !== 'draft') return;
     if (!$event->starts_at) return;
 
-    // Si faltan 24 horas o menos para el inicio
-    if (now()->diffInHours($event->starts_at, false) <= 24) {
+    // Auto-open betting five days before kickoff.
+    if (now()->diffInDays($event->starts_at, false) <= 5) {
 
         $event->update([
             'status' => 'open',

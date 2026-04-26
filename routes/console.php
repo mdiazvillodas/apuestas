@@ -29,7 +29,7 @@ Schedule::call(function () {
         );
 
     Event::where('status','draft')
-        ->where('starts_at','<=',now()->addHours(24))
+        ->where('starts_at','<=',now()->addDays(5))
         ->update([
             'status'=>'open',
             'betting_opens_at'=>now()
