@@ -9,7 +9,7 @@
         {{-- Logo / Nombre --}}
         <div class="mb-10">
             <div class="text-4xl text-white tracking-tight">
-                NanoBet
+                Freepickbet
             </div>
             <div class="mt-2 text-sm text-gray-500 mb-2">
                 Bet. Compete. Climb the leaderboard.
@@ -35,7 +35,7 @@
 
         {{-- Footer --}}
         <div class="mt-10 text-xs text-gray-400 mt-2">
-            © {{ date('Y') }} NanoBet
+            © {{ date('Y') }} Freepickbet
         </div>
     </div>
 </x-guest-layout>

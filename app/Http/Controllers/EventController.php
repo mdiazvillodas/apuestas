@@ -20,7 +20,7 @@ public function index()
         ->where('status', '!=', 'draft')
         ->where('betting_opens_at', '<=', $now)
         ->where('betting_closes_at', '>=', $now->copy()->subHours(12))
-        ->orderBy('betting_opens_at', 'desc')
+        ->orderBy('betting_closes_at')
         ->get();
 
     return view('events.index', [

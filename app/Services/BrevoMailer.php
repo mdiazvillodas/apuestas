@@ -16,7 +16,7 @@ class BrevoMailer
                 'Content-Type' => 'application/json',
             ])->post('https://api.brevo.com/v3/smtp/email', [
                 'sender' => [
-                    'name' => 'NanoBet',
+                    'name' => 'Freepickbet',
                     'email' => 'mariano.diazvillodas@gmail.com',
                 ],
                 'to' => [

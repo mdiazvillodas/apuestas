@@ -27,7 +27,7 @@
                     </x-nav-link>
 
                     <x-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
-                        Events
+                        Bet Now
                     </x-nav-link>
 
                     <x-nav-link :href="route('leaderboard.index')" :active="request()->routeIs('leaderboard.*')">
@@ -189,7 +189,7 @@
     <div x-show="open" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')">Dashboard</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('events.index')">Events</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('events.index')">Bet Now</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('bets.my')">My Bets</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('leagues.index')" :active="request()->routeIs('leagues.*')">My Leagues</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('leaderboard.index')" :active="request()->routeIs('leaderboard.*')">Leaderboard</x-responsive-nav-link>

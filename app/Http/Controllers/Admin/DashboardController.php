@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bet;
+use App\Models\League;
 use App\Models\User;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,7 @@ class DashboardController extends Controller
     {
         $totalBets = Bet::count();
         $totalUsers = User::count();
+        $totalLeagues = League::count();
         $totalCoinsStaked = Bet::sum('amount');
 
         $dailyBets = Bet::query()
@@ -57,6 +59,7 @@ class DashboardController extends Controller
         return view('admin.dashboard', [
             'totalBets' => $totalBets,
             'totalUsers' => $totalUsers,
+            'totalLeagues' => $totalLeagues,
             'totalCoinsStaked' => $totalCoinsStaked,
             'chartLabels' => $chartLabels,
             'chartCoins' => $chartCoins,

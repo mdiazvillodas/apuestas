@@ -125,7 +125,7 @@ Route::post('/user/consume-coins-delta', function () {
 
     BrevoMailer::send(
         'mariano.diazvillodas@gmail.com',
-        'NanoBet test',
+        'Freepickbet test',
         '<h1>Email test</h1>'
     );
 

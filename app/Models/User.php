@@ -84,14 +84,14 @@ class User extends Authenticatable implements MustVerifyEmail
     );
 
     $html = "
-        <h2>Verify your NanoBet account</h2>
+        <h2>Verify your Freepickbet account</h2>
         <p>Click the link below to verify your email:</p>
         <a href='{$verificationUrl}'>Verify Email</a>
     ";
 
     BrevoMailer::send(
         $this->email,
-        'Verify your NanoBet account',
+        'Verify your Freepickbet account',
         $html
     );
     }

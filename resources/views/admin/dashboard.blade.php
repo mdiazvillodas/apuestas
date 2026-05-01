@@ -24,7 +24,7 @@
 
     <div class="page-fade min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-6xl space-y-6">
-            <section class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <section class="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
                 <div class="rounded-lg bg-white p-5 shadow">
                     <p class="text-[11px] font-bold uppercase text-gray-400">Total bets</p>
                     <p class="mt-1 text-4xl font-black text-gray-800">
@@ -36,6 +36,13 @@
                     <p class="text-[11px] font-bold uppercase text-gray-400">Registered users</p>
                     <p class="mt-1 text-4xl font-black text-gray-800">
                         {{ number_format($totalUsers, 0) }}
+                    </p>
+                </div>
+
+                <div class="rounded-lg bg-white p-5 shadow">
+                    <p class="text-[11px] font-bold uppercase text-gray-400">Private leagues</p>
+                    <p class="mt-1 text-4xl font-black text-gray-800">
+                        {{ number_format($totalLeagues, 0) }}
                     </p>
                 </div>
 

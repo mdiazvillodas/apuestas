@@ -119,4 +119,66 @@
             </section>
         </div>
     </div>
+
+    <div
+        id="leaderboard-info-modal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 px-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="leaderboard-info-title"
+    >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl">
+            <h3 id="leaderboard-info-title" class="font-['Bebas_Neue'] text-3xl text-[#444]">
+                How the leaderboard works
+            </h3>
+
+            <p class="mt-3 text-sm leading-6 text-gray-600">
+                The winner is the player with the highest betting profit, not the player with the highest coin balance.
+            </p>
+
+            <div class="mt-4 rounded-lg bg-gray-50 p-4 text-sm leading-6 text-gray-600">
+                Profit is based on what users win or lose from their bets. Keeping coins without betting does not move a player up the ranking.
+            </div>
+
+            <p class="mt-4 text-sm leading-6 text-gray-600">
+                You can also create or join private leagues and compete with friends using the same bets.
+            </p>
+
+            <a
+                href="{{ route('leagues.index') }}"
+                class="mt-5 flex h-11 w-full items-center justify-center rounded-lg bg-yellow-400 text-sm font-black uppercase text-gray-900"
+            >
+                Try leagues
+            </a>
+
+            <button
+                type="button"
+                id="leaderboard-info-dismiss"
+                class="mt-3 h-11 w-full rounded-lg border border-gray-200 text-sm font-black uppercase text-gray-600"
+            >
+                Got it
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const storageKey = 'freepickbet:leaderboard-info-modal:v1';
+            const modal = document.getElementById('leaderboard-info-modal');
+            const dismissButton = document.getElementById('leaderboard-info-dismiss');
+
+            if (!modal || !dismissButton || localStorage.getItem(storageKey)) {
+                return;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            dismissButton.addEventListener('click', () => {
+                localStorage.setItem(storageKey, 'seen');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            });
+        });
+    </script>
 </x-app-layout>

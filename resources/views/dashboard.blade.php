@@ -67,7 +67,7 @@
                         href="{{ route('events.index') }}"
                         class="rounded-lg bg-yellow-400 px-3 py-2 text-xs font-black uppercase text-gray-900"
                     >
-                        Events
+                        Bet Now
                     </a>
                 </div>
 

@@ -201,4 +201,64 @@
 
         </div>
     </div>
+
+    <div
+        id="payout-info-modal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 px-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="payout-info-title"
+    >
+        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl">
+            <h3 id="payout-info-title" class="font-['Bebas_Neue'] text-3xl text-[#444]">
+                About 1x payouts
+            </h3>
+
+            <p class="mt-3 text-sm leading-6 text-gray-600">
+                If both teams appear to be paying 1x, it usually means one of two things:
+            </p>
+
+            <ul class="mt-4 space-y-2 text-sm leading-6 text-gray-600">
+                <li class="rounded-lg bg-gray-50 p-3">
+                    No one has placed a bet on either team yet.
+                </li>
+                <li class="rounded-lg bg-gray-50 p-3">
+                    Everyone who has bet so far placed their bet on the same team.
+                </li>
+            </ul>
+
+            <p class="mt-4 text-xs text-gray-500">
+                Payouts can change as more users place bets before betting closes.
+            </p>
+
+            <button
+                type="button"
+                id="payout-info-dismiss"
+                class="mt-5 h-11 w-full rounded-lg bg-yellow-400 text-sm font-black uppercase text-gray-900"
+            >
+                Got it
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const storageKey = 'freepickbet:payout-info-modal:v1';
+            const modal = document.getElementById('payout-info-modal');
+            const dismissButton = document.getElementById('payout-info-dismiss');
+
+            if (!modal || !dismissButton || localStorage.getItem(storageKey)) {
+                return;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            dismissButton.addEventListener('click', () => {
+                localStorage.setItem(storageKey, 'seen');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            });
+        });
+    </script>
 </x-app-layout>
