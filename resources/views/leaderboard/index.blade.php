@@ -14,7 +14,7 @@
                             {{ $activeLeague ? $activeLeague->name : 'General leaderboard' }}
                         </h3>
                         <p class="text-sm text-gray-500">
-                            Ranked by coins won from bets
+                            Ranked by coins won from winning bets
                         </p>
                     </div>
 
@@ -133,11 +133,11 @@
             </h3>
 
             <p class="mt-3 text-sm leading-6 text-gray-600">
-                The winner is the player with the most coins won from bets, not the player with the highest coin balance.
+                The winner is the player with the most coins won from winning bets, not the player with the highest coin balance.
             </p>
 
             <div class="mt-4 rounded-lg bg-gray-50 p-4 text-sm leading-6 text-gray-600">
-                Net profit and balance can help you understand performance, but ranking is decided by total coins won. Keeping coins without betting does not move a player up the leaderboard.
+                Won minus lost equals net. Ranking is decided by won coins, so keeping coins without betting does not move a player up the leaderboard.
             </div>
 
             <p class="mt-4 text-sm leading-6 text-gray-600">

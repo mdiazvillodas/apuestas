@@ -40,8 +40,8 @@ class LeaderboardController extends Controller
             ->map(function ($user) {
 
                 $won = $user->bets
-                    ->where('status', 'won')
-                    ->sum('payout_amount');
+                    ->where('profit', '>', 0)
+                    ->sum('profit');
 
                 $lost = abs(
                     $user->bets
