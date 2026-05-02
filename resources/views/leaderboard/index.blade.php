@@ -14,7 +14,7 @@
                             {{ $activeLeague ? $activeLeague->name : 'General leaderboard' }}
                         </h3>
                         <p class="text-sm text-gray-500">
-                            Ranked by betting profit
+                            Ranked by coins won from bets
                         </p>
                     </div>
 
@@ -57,7 +57,7 @@
                                     <th class="py-2 text-left">Player</th>
                                     <th class="text-right">Won</th>
                                     <th class="text-right">Lost</th>
-                                    <th class="text-right">Profit</th>
+                                    <th class="text-right">Net</th>
                                 </tr>
                             </thead>
 
@@ -133,11 +133,11 @@
             </h3>
 
             <p class="mt-3 text-sm leading-6 text-gray-600">
-                The winner is the player with the highest betting profit, not the player with the highest coin balance.
+                The winner is the player with the most coins won from bets, not the player with the highest coin balance.
             </p>
 
             <div class="mt-4 rounded-lg bg-gray-50 p-4 text-sm leading-6 text-gray-600">
-                Profit is based on what users win or lose from their bets. Keeping coins without betting does not move a player up the ranking.
+                Net profit and balance can help you understand performance, but ranking is decided by total coins won. Keeping coins without betting does not move a player up the leaderboard.
             </div>
 
             <p class="mt-4 text-sm leading-6 text-gray-600">

@@ -74,6 +74,7 @@ protected function syncSingleFixture(array $fixture): void
                 'betting_opens_at' => $bettingOpensAt,
                 'betting_closes_at' => $bettingClosesAt,
                 'round' => $fixture['league']['round'] ?? $event->round,
+                ...$this->scoreFieldsFromFixture($fixture),
             ]);
         }
     }
@@ -109,6 +110,7 @@ protected function createEventFromFixture(array $fixture): Event
         'betting_opens_at' => $bettingOpensAt,
         'betting_closes_at' => $bettingClosesAt,
         'status' => 'draft',
+        ...$this->scoreFieldsFromFixture($fixture),
         'external_id' => $fixture['fixture']['id'],
         'source' => 'api',
         'round' => $fixture['league']['round'] ?? null,
@@ -151,7 +153,7 @@ protected function handleAutoSettle(Event $event, array $fixture): void
 
     if ($event->status === 'finished') return;
 
-    if (($fixture['fixture']['status']['short'] ?? null) !== 'FT') return;
+    if (! in_array($fixture['fixture']['status']['short'] ?? null, ['FT', 'AET', 'PEN'], true)) return;
 
     $homeGoals = $fixture['goals']['home'] ?? 0;
     $awayGoals = $fixture['goals']['away'] ?? 0;
@@ -166,5 +168,19 @@ protected function handleAutoSettle(Event $event, array $fixture): void
 
     app(\App\Services\SettlementService::class)
         ->settle($event, $result);
+}
+
+protected function scoreFieldsFromFixture(array $fixture): array
+{
+    $homeScore = $fixture['goals']['home'] ?? null;
+    $awayScore = $fixture['goals']['away'] ?? null;
+
+    return [
+        'team_a_score' => is_numeric($homeScore) ? (int) $homeScore : null,
+        'team_b_score' => is_numeric($awayScore) ? (int) $awayScore : null,
+        'match_status_short' => $fixture['fixture']['status']['short'] ?? null,
+        'match_status_long' => $fixture['fixture']['status']['long'] ?? null,
+        'score_updated_at' => now(),
+    ];
 }
 }

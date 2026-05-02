@@ -81,6 +81,8 @@
                         {{ $event->starts_at->timezone('Europe/Madrid')->format('M d, Y · H:i') }} CET
                     </p>
                 </div>
+
+                @include('events.partials.score-status', ['event' => $event])
             </section>
 
             @if($myBet)

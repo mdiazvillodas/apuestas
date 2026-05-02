@@ -17,6 +17,11 @@ class Event extends Model
         'starts_at',
         'status',
         'result',
+        'team_a_score',
+        'team_b_score',
+        'match_status_short',
+        'match_status_long',
+        'score_updated_at',
         'external_id',
         'source',
         'round',
@@ -27,6 +32,7 @@ class Event extends Model
         'betting_opens_at'  => 'datetime',
         'betting_closes_at' => 'datetime',
         'starts_at'         => 'datetime',
+        'score_updated_at'   => 'datetime',
     ];
 
     /*
@@ -82,6 +88,21 @@ class Event extends Model
 
         // Único caso apostable
         return 'open';
+    }
+
+    public function getHasScoreAttribute(): bool
+    {
+        return ! is_null($this->team_a_score) && ! is_null($this->team_b_score);
+    }
+
+    public function getIsLiveAttribute(): bool
+    {
+        return in_array($this->match_status_short, ['1H', 'HT', '2H', 'ET', 'BT', 'P', 'SUSP', 'INT', 'LIVE'], true);
+    }
+
+    public function getHasFinalScoreAttribute(): bool
+    {
+        return in_array($this->match_status_short, ['FT', 'AET', 'PEN'], true);
     }
 
     /*
