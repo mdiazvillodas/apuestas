@@ -1,204 +1,239 @@
 <x-app-layout>
     <x-slot name="header">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl">
-                    {{ __('Events') }}
-                </h2>
-                <div class="text-md">
-
-                </div>  
-            </div>          
+        <div class="flex justify-between items-center">
+            <h2>
+                Bet Now
+            </h2>
+        </div>
     </x-slot>
 
-    <div class="page-fade py-12 min-h-screen">
-        <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
-            {{-- Lista de Eventos --}}
-            <div class="space-y-6">
-                @forelse($events as $event)
+    @php
+        $availableEvents = $events->filter(fn ($event) => ! $event->bets->first() && $event->computed_status === 'open');
+        $pickedEvents = $events->filter(fn ($event) => $event->bets->first());
+    @endphp
 
-                    @php
-                        $myBet = $event->bets->first();
-                    @endphp
-
-                    <div style="padding-top:20px;" class="leaderboard bg-white rounded-xl p-8 shadow-2xl border border-gray-200">
-                        <h3 style="font-family:'Bebas Neue'" class="event-title text-center text-sm uppercase tracking-wider mb-4 text-xl text-gray-600">
-                            {{ $event->title }}
+    <div class="page-fade min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-xl space-y-8">
+            <section>
+                <div class="mb-4 flex items-end justify-between">
+                    <div>
+                        <h3 class="font-['Bebas_Neue'] text-3xl text-[#444]">
+                            Available Matches
                         </h3>
-                        {{-- Equipos --}}
-                        <div class="flex justify-between items-start">
+                        <p class="text-sm text-gray-500">
+                            Pick your side before betting closes.
+                        </p>
+                    </div>
 
-                            {{-- Team A --}}
-                            <div class="flex flex-col items-center flex-1">
-                                <div
-                                    class="w-20 h-20 mb-4"
-                                    style="
-                                        @if($event->teamA)
-                                            background: url('{{ $event->teamA->logo_path }}');
-                                            background-size: contain;
-                                            background-position: center;
-                                            background-repeat: no-repeat;
-                                        @endif
-                                    ">
-                                </div>
-
-                                <h3 class="event-team text-[10px] font-bold uppercase text-center h-8 leading-tight">
-                                    {{ $event->teamA?->name ?? 'TBD' }}
-                                </h3>
-
-                                <div class="event-rate text-lg font-black text-gray-900 mt-1">
-                                    {{ number_format($event->payoutFor('team_a'), 2) }}x
-                                </div>
-                            </div>
-
-                            {{-- VS --}}
-                            <div class="pt-6 px-2">
-                                <span class="text-2xl font-black italic text-gray-900">VS</span>
-                            </div>
-
-                            {{-- Team B --}}
-                            <div class="flex flex-col items-center flex-1">
-                                <div
-                                    class="w-20 h-20 mb-4"
-                                    style="
-                                        @if($event->teamB)
-                                            background: url('{{ $event->teamB->logo_path }}');
-                                            background-size: contain;
-                                            background-position: center;
-                                            background-repeat: no-repeat;
-                                        @endif
-                                    ">
-                                </div>
-
-                                <h3 class="event-team text-[10px] font-bold uppercase text-center h-8 leading-tight">
-                                    {{ $event->teamB?->name ?? 'TBD' }}
-                                </h3>
-
-                                <div class="event-rate text-lg font-black text-gray-900 mt-1">
-                                    {{ number_format($event->payoutFor('team_b'), 2) }}x
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {{-- Info secundaria --}}
-                        <div class="mt-4 border-t border-gray-100 pt-4 text-center">
-                            <div class="text-[10px] font-medium text-gray-400 uppercase tracking-tighter">
-                                Draw:
-                                <span class=" text-gray-500">
-                                    {{ number_format($event->payoutFor('draw'), 2) }}x
-                                </span>
-                                
-                            </div>
-
-                        <div class="mt-2 text-[10px] text-gray-400">
-                        <span
-                            class="event-start"
-                            data-start="{{ $event->starts_at->toIso8601String() }}"
-                        >
+                    @if($availableEvents->count())
+                        <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-black uppercase text-yellow-700">
+                            {{ $availableEvents->count() }} open
                         </span>
+                    @endif
+                </div>
 
-                            <div
-                                class="mt-1 text-[11px] text-gray-500 countdown"
-                                data-closes-at="{{ $event->betting_closes_at?->toIso8601String() }}"
-                            >
-                                —
+                <div class="space-y-6">
+                    @forelse($availableEvents as $event)
+                        <article class="leaderboard overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl">
+                            <div class="p-6">
+                                <h3 class="event-title text-center">
+                                    {{ $event->title }}
+                                </h3>
+
+                                <div class="mt-5 grid grid-cols-[1fr_auto_1fr] items-start gap-3">
+                                    <div class="flex min-w-0 flex-col items-center">
+                                        <div
+                                            class="mb-3 h-20 w-20"
+                                            style="
+                                                @if($event->teamA)
+                                                    background: url('{{ $event->teamA->logo_path }}');
+                                                    background-size: contain;
+                                                    background-position: center;
+                                                    background-repeat: no-repeat;
+                                                @endif
+                                            "
+                                        ></div>
+
+                                        <h4 class="event-team h-10 text-center">
+                                            {{ $event->teamA?->name ?? 'TBD' }}
+                                        </h4>
+
+                                        <div class="event-rate mt-1">
+                                            {{ number_format($event->payoutFor('team_a'), 2) }}x
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-7">
+                                        <span class="event-vs">VS</span>
+                                    </div>
+
+                                    <div class="flex min-w-0 flex-col items-center">
+                                        <div
+                                            class="mb-3 h-20 w-20"
+                                            style="
+                                                @if($event->teamB)
+                                                    background: url('{{ $event->teamB->logo_path }}');
+                                                    background-size: contain;
+                                                    background-position: center;
+                                                    background-repeat: no-repeat;
+                                                @endif
+                                            "
+                                        ></div>
+
+                                        <h4 class="event-team h-10 text-center">
+                                            {{ $event->teamB?->name ?? 'TBD' }}
+                                        </h4>
+
+                                        <div class="event-rate mt-1">
+                                            {{ number_format($event->payoutFor('team_b'), 2) }}x
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-5 border-t border-gray-100 pt-4 text-center">
+                                    <div class="text-xs font-bold uppercase text-gray-400">
+                                        Draw:
+                                        <span class="text-gray-500">
+                                            {{ number_format($event->payoutFor('draw'), 2) }}x
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-2 text-xs text-gray-400">
+                                        <span
+                                            class="event-start"
+                                            data-start="{{ $event->starts_at->toIso8601String() }}"
+                                        ></span>
+
+                                        <div
+                                            class="countdown mt-1 inline-block text-[11px] font-bold text-gray-500"
+                                            data-closes-at="{{ $event->betting_closes_at?->toIso8601String() }}"
+                                        >
+                                            -
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
+                            <a
+                                href="{{ route('events.show', $event) }}"
+                                class="block h-12 bg-yellow-400 text-center text-sm font-black uppercase leading-[48px] tracking-widest text-gray-900 hover:bg-yellow-300"
+                            >
+                                Bet Now
+                            </a>
+                        </article>
+                    @empty
+                        <div class="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-10 text-center shadow">
+                            <p class="font-['Bebas_Neue'] text-3xl text-[#444]">
+                                No open matches
+                            </p>
+                            <p class="mt-2 text-sm text-gray-500">
+                                Check back soon for new betting opportunities.
+                            </p>
                         </div>
-                        </div>
+                    @endforelse
+                </div>
+            </section>
 
-                        {{-- Acción --}}
-                        <div class="mt-6">
-                            @php
-                                $now = now();
-                            @endphp
+            <section>
+                <div class="mb-4 flex items-end justify-between">
+                    <div>
+                        <h3 class="font-['Bebas_Neue'] text-3xl text-[#444]">
+                            Your Picks
+                        </h3>
+                        <p class="text-sm text-gray-500">
+                            Your live bets in play.
+                        </p>
+                    </div>
 
-                            @if($myBet)
+                    @if($pickedEvents->count())
+                        <span class="rounded-full bg-gray-900 px-3 py-1 text-xs font-black uppercase text-white">
+                            {{ $pickedEvents->count() }} picks
+                        </span>
+                    @endif
+                </div>
 
-                                @php
-                                    $selectionLabel = match ($myBet->selection) {
-                                        'team_a' => $event->teamA?->name ?? 'Team A',
-                                        'team_b' => $event->teamB?->name ?? 'Team B',
-                                        'draw'   => 'Draw',
-                                    };
+                <div class="space-y-3">
+                    @forelse($pickedEvents as $event)
+                        @php
+                            $myBet = $event->bets->first();
+                            $selectionLabel = match ($myBet->selection) {
+                                'team_a' => $event->teamA?->name ?? 'Team A',
+                                'team_b' => $event->teamB?->name ?? 'Team B',
+                                'draw' => 'Draw',
+                            };
+                            $hasResult = ! is_null($event->result);
+                            $won = $hasResult && $myBet->selection === $event->result;
+                            $statusClasses = $hasResult
+                                ? ($won ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')
+                                : 'bg-yellow-100 text-yellow-700';
+                            $statusLabel = $hasResult ? ($won ? 'Won' : 'Lost') : 'Pending';
+                        @endphp
 
-                                    $hasResult = !is_null($event->result);
-                                    $won = $hasResult && $myBet->selection === $event->result;
-                                @endphp
+                        <article class="rounded-lg border border-gray-200 bg-white p-4 shadow">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0">
+                                    <p class="truncate text-base font-black text-gray-800">
+                                        {{ $event->title }}
+                                    </p>
+                                    <p class="mt-1 text-xs text-gray-500">
+                                        {{ $event->teamA?->name ?? 'TBD' }} vs {{ $event->teamB?->name ?? 'TBD' }}
+                                    </p>
+                                </div>
 
-                                <div class="p-3 text-center rounded-lg
-                                    {{ $hasResult ? ($won ? 'bg-green-100' : 'bg-red-100') : 'bg-gray-100' }}">
-                                    <div class="text-[10px] font-bold uppercase text-gray-400">
-                                        Your bet
-                                    </div>
-                                    <div class="mt-1 text-sm font-black">
-                                        {{ strtoupper($selectionLabel) }}
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-1">
-                                        {{ $myBet->amount }} coins
-                                    </div>
-                                    @if($hasResult)
-                                        <div style="font-weight:700; padding-bottom:10px;" class="mt-2 text-xs font-bold uppercase
-                                            {{ $won ? 'text-green-700' : 'text-red-700' }}">
-                                            {{ $won ? 'You won' : 'You Lost' }}
-                                        </div>
-                                    @else
-                                        <div class="mt-2 text-[10px] font-bold uppercase text-gray-400">
-                                            Pending
-                                        </div>
+                                <span class="shrink-0 rounded-full px-3 py-1 text-xs font-black uppercase {{ $statusClasses }}">
+                                    {{ $statusLabel }}
+                                </span>
+                            </div>
+
+                            <div class="mt-4 grid grid-cols-2 gap-3">
+                                <div class="rounded-lg bg-gray-50 p-3">
+                                    <p class="text-[11px] font-bold uppercase text-gray-400">Your pick</p>
+                                    <p class="mt-1 truncate text-sm font-black text-gray-800">
+                                        {{ $selectionLabel }}
+                                    </p>
+                                </div>
+
+                                <div class="rounded-lg bg-gray-50 p-3">
+                                    <p class="text-[11px] font-bold uppercase text-gray-400">Stake</p>
+                                    <p class="mt-1 text-sm font-black text-gray-800">
+                                        {{ number_format($myBet->amount, 0) }} coins
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
+                                <div>
+                                    <p
+                                        class="event-start text-xs font-bold uppercase text-gray-400"
+                                        data-start="{{ $event->starts_at->toIso8601String() }}"
+                                    ></p>
+                                    @if(! $hasResult)
+                                        <p
+                                            class="event-countdown mt-1 text-sm font-black text-yellow-600"
+                                            data-starts-at="{{ $event->starts_at->toIso8601String() }}"
+                                        >
+                                            -
+                                        </p>
                                     @endif
                                 </div>
-                            @elseif($event->computed_status === 'open')
+
                                 <a
                                     href="{{ route('events.show', $event) }}"
-                                    class="block w-full h-[50px] leading-[50px]
-                                        bg-yellow-400 text-center
-                                        text-xs font-black uppercase tracking-widest
-                                        text-gray-900 rounded-b-xl"
-                                    style="
-                                        height: 50px;
-                                        background: gold;
-                                        font-weight: 700;
-                                        font-size: 1rem;
-                                        line-height: 50px;
-                                        border-radius: 0px 0px 10px 10px;"
+                                    class="rounded-lg border border-gray-200 px-3 py-2 text-xs font-black uppercase text-gray-600"
                                 >
-                                    Bet Now
+                                    View
                                 </a>
-
-                            @else
-
-                                <div class="w-full py-3 bg-gray-100 text-center text-[10px] font-bold uppercase">
-                                    @if(is_null($event->result))
-                                        <span class="text-yellow-500">
-                                            Pending
-                                        </span>
-                                    @else
-                                        <span class="text-blue-600">
-                                            @if($event->result === 'team_a')
-                                                {{ $event->teamA?->name }} Won
-                                            @elseif($event->result === 'team_b')
-                                                {{ $event->teamB?->name }} Won
-                                            @else
-                                                Draw
-                                            @endif
-                                        </span>
-                                    @endif
-                                </div>
-
-                            @endif
+                            </div>
+                        </article>
+                    @empty
+                        <div class="rounded-lg border border-dashed border-gray-300 bg-white px-6 py-8 text-center shadow">
+                            <p class="text-sm italic text-gray-500">
+                                Your picks will appear here after you place a bet.
+                            </p>
                         </div>
-
-
-
-                    </div>
-                @empty
-                    <div class="text-center py-10">
-                        <p class="text-gray-500 italic">No events available at the moment.</p>
-                    </div>
-                @endforelse
-            </div>
-
+                    @endforelse
+                </div>
+            </section>
         </div>
     </div>
 

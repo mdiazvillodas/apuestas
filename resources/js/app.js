@@ -263,6 +263,7 @@ function startCountdown(el) {
         if (diff <= 0) {
             el.textContent = 'Betting closed';
             el.classList.remove('text-gray-500');
+            el.classList.remove('text-yellow-600');
             el.classList.add('text-red-500');
             return;
         }
@@ -273,6 +274,15 @@ function startCountdown(el) {
         const seconds = totalSeconds % 60;
 
         el.textContent = `Closes in ${hours}h ${minutes}m ${seconds}s`;
+
+        if (totalSeconds <= 600) {
+            el.classList.remove('text-gray-500');
+            el.classList.add('rounded-full', 'bg-red-100', 'px-2', 'py-1', 'text-red-700');
+            return;
+        }
+
+        el.classList.add('text-gray-500');
+        el.classList.remove('rounded-full', 'bg-red-100', 'px-2', 'py-1', 'text-red-700');
     }
 
     update();
