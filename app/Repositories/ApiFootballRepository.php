@@ -10,7 +10,7 @@ class ApiFootballRepository implements FixtureRepositoryInterface
     public function getFixtures(int $leagueId, int $season): array
     {
         $from = now()->toDateString();
-        $to = now()->addDays(7)->toDateString();
+        $to = now()->addDays(3)->toDateString();
 
         logger()->info('REQUESTING FIXTURES', [
             'from' => $from,

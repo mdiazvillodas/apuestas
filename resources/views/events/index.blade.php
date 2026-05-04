@@ -103,20 +103,46 @@
                                         'team_b' => $event->teamB?->name ?? 'Team B',
                                         'draw' => 'Draw',
                                     };
+
+                                    $betStatusClasses = match ($myBet->status) {
+                                        'won' => 'border-green-200 bg-green-100 text-green-700',
+                                        'lost' => 'border-red-200 bg-red-100 text-red-700',
+                                        default => 'border-yellow-200 bg-yellow-100 text-yellow-700',
+                                    };
+
+                                    $betStatusLabel = match ($myBet->status) {
+                                        'won' => 'You won',
+                                        'lost' => 'You lost',
+                                        default => 'Pending',
+                                    };
                                 @endphp
 
-                                <div class="mt-5 rounded-lg bg-gray-50 p-4 text-center">
-                                    <div class="text-xs font-black uppercase text-gray-400">
-                                        Your bet
+                                <div class="mt-5 rounded-lg bg-gray-50 p-4">
+                                    <div class="flex flex-col items-center justify-between gap-3 text-center sm:flex-row sm:text-left">
+                                        <div>
+                                            <div class="text-xs font-black uppercase text-gray-400">
+                                                Your bet
+                                            </div>
+
+                                            <div class="mt-1 text-sm font-black text-gray-800">
+                                                {{ $selectionLabel }} - {{ number_format($myBet->amount, 0) }} coins
+                                            </div>
+                                        </div>
+
+                                        <span class="shrink-0 rounded-full border px-3 py-1 text-[11px] font-black uppercase {{ $betStatusClasses }}">
+                                            {{ $betStatusLabel }}
+                                        </span>
                                     </div>
 
-                                    <div class="mt-1 text-sm font-black text-gray-800">
-                                        {{ $selectionLabel }} - {{ number_format($myBet->amount, 0) }} coins
-                                    </div>
+                                    @if(! is_null($myBet->profit))
+                                        <div class="mt-3 rounded-lg bg-white px-3 py-2 text-center text-sm font-black {{ $myBet->profit >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                            {{ $myBet->profit >= 0 ? '+' : '' }}{{ number_format($myBet->profit, 0) }} coins
+                                        </div>
+                                    @endif
 
                                     <a
                                         href="{{ route('events.show', $event) }}"
-                                        class="mt-3 inline-flex rounded-lg border border-gray-200 px-4 py-2 text-xs font-black uppercase text-gray-600 hover:border-yellow-400 hover:text-gray-900"
+                                        class="mx-auto mt-3 flex w-fit rounded-lg border border-gray-200 px-4 py-2 text-xs font-black uppercase text-gray-600 hover:border-yellow-400 hover:text-gray-900"
                                     >
                                         View bet
                                     </a>
