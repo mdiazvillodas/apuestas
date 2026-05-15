@@ -7,13 +7,6 @@
 
     <div class="page-fade min-h-screen px-4 py-8 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-xl space-y-5">
-            <a
-                href="{{ route('events.index') }}"
-                class="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-gray-800"
-            >
-                Back to events
-            </a>
-
             @if($errors->any())
                 <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
                     {{ $errors->first() }}
@@ -102,6 +95,13 @@
                     <p class="mt-1 text-xs font-bold uppercase text-gray-500">
                         Status: {{ $myBet->status }}
                     </p>
+
+                    <a
+                        href="{{ route('events.index') }}"
+                        class="mt-5 inline-flex h-12 w-full items-center justify-center rounded-lg bg-green-600 px-4 text-sm font-black uppercase text-white shadow-sm transition hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    >
+                        Back to events
+                    </a>
                 </section>
             @else
                 <form
